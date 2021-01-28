@@ -1,0 +1,51 @@
+\documentclass{article}
+
+\title{TSIU51 Mikrodatorprojekt - Kravsprecification}
+
+\author{
+	Johan Klasén johkl473, Di1b
+	\and
+	Oskar Lundh, osklu130, Di1b
+	}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\paragraph{Beskrivning:}
+Spelet Pong bygger på en rektangulär spelplan, där det på två motstående sidor finns ett spelarstyrt racket. En boll "servas" från mitten och kan studsa på dom två sidorna som inte har racket,
+och nuddar bollen en av racketsidorna så får motstående spelare ett poäng. Spelarna kan flytta sitt racket längs med sin sida och målet är att förhindra att bollen kommer igenom, samtidigt som man styr in den på motståndarens sida.
+Vi vill försöka göra detta spel med hjälp av hårdvaran på ett DAvid-kort och någon form av display.
+
+\hfill
+
+\paragraph{Skall-krav:}
+\begin{itemize}
+	\item Spelet ska visas på en display (1 eller 2 DAmatrix, alt 64x128).
+	\item Styrs av båda joysticksen av två spelare.
+	\item Spelet startar med en knapptryckning.
+	\item Båda 7-segmentsdisplayerna visar respektive spelares poäng.
+	\item Varje spel går i set (typ bäst av/först till 3 eller 5).
+	\item Poäng och vinster skrivs ut som meddelande på LCDn (Player 1 o 2 eller vänster/höger).
+
+\end{itemize}
+
+\paragraph{Utökade krav:}
+\begin{itemize}
+	\item Kunna välja namn på båda spelare. (Rotary + knappar).
+	\item Ljud till spelet.
+	\item Enkelt menysystem för 1-2 spelare (antal).
+	\item Bygga en “AI” för enspelarläge (ev så enkelt som att ena racket rör sig slumpmässigt eller alltid kontrar bollen).
+
+	\item ((Om mycket tid över och alla rutiner för moduler är igång, lägga till ytterligare enkelt spel + menyval, typ snake/4-i-rad))
+\end{itemize}
+
+
+\paragraph{Komponenter:}
+\begin{itemize}
+	\item DAvid-kort
+	\item DAmatrix
+\end{itemize}
+
+\end{document}
