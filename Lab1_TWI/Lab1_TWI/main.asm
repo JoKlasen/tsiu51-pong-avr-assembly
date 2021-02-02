@@ -23,23 +23,33 @@
 		
 		; Här kan vi köra satta värden som .equ listor och liknande
 
-		.equ	ADDR_RIGHT8	= $25
-		.equ	ADDR_ROTLED	= $26
-		.equ	ADDR_SWIT	= $27				
+		.equ	ADDR_LEFT8	= $24		; IC2
+		.equ	ADDR_RIGHT8	= $25		; IC3
+		.equ	ADDR_ROTLED	= $26		; IC4
+		.equ	ADDR_SWITCH	= $27		; IC5			
 		;.equ	SLA_W		= (ADDR_RIGHT8 << 1) | 0	; $4A 0b01001010
 		;.equ	SLA_R		= (ADDR_RIGHT8 << 1) | 1	; $4B 0b01001011
 
-		.equ	SCL		= PC5
-		.equ	SDA		= PC4
+		; Arduino pins
+		.equ	SCL			= PC5
+		.equ	SDA			= PC4
 
-		.equ	SW_R	= PD0
-		.equ	SW_L	= PD1
+		.equ	SW_R		= PD0
+		.equ	SW_L		= PD1
+
+		; IC5, SWITCH 
+		.equ	SW_R1		= 0
+		.equ	SW_R2		= 1
+		.equ	SW_L1		= 2
+		.equ	SW_L2		= 3
+		.equ	JOY_R_SEL	= 4
+		.equ	JOY_L_SEL	= 5
 
 		.equ	N		= $64							; Styr en sekund delay DELAY_N, som går att variera lite
 														; $64 = ~1000,03 ms om DELAY=10ms
 														; $3D = ~999,5 ms om DELAY=16ms
 
-SEVEN_SEG:
+TAB_7SEG:
 		.db 	$3F, $06, $5B, $4F, $66, $6D, $7D, $07, $7F, $6F, $77, $7C, $39, $5E, $79, $71
 														; LOOKUP-tabell för 0-F i 7-seg (pgfedcba), p=0
 ;::::::::::::::::
@@ -54,15 +64,26 @@ COLD:
 		ldi 	r16, LOW(RAMEND)
 		out 	SPL, r16
 
-		jmp		KEY_TEST2
+		jmp		RIGHT8_COUNTER
 
 ;::::::::::::::::
 ;	Huvudprogram
 ;::::::::::::::::
 
+RIGHT8_COUNTER:
+		ldi		r18, $00
+RCOUNTER_LOOP:
+		mov		r16, r18
+		call	RIGHT8_WRITE
+		call	DELAY_N
+		cpi		r18, $0F
+		breq	RIGHT8_COUNTER
+		inc		r18
+		rjmp	RCOUNTER_LOOP
+
 TWI_SEND_TEST:
-		ldi 	ZH, HIGH(SEVEN_SEG*2)
-		ldi 	ZL, LOW(SEVEN_SEG*2)
+		ldi 	ZH, HIGH(TAB_7SEG*2)
+		ldi 	ZL, LOW(TAB_7SEG*2)
 		ldi		r18, $0F
 TEST_LOOP:
 		lpm		r16, Z+
@@ -90,7 +111,7 @@ HARD_TEST:
 		rjmp	HARD_TEST
 
 READ_TEST:
-		ldi		r17, ADDR_SWIT
+		ldi		r17, ADDR_SWITCH
 		call	TWI_READ
 		ldi		r17, ADDR_RIGHT8
 		call	TWI_SEND
@@ -133,23 +154,26 @@ KEY_PRESSED:
 ;::::::::::::::::
 
 RQ:
-		sbis	PIND, 0
+		sbis	PIND, SW_R
 		sez
 		ret
 
 
 R1Q:
-		call	SWITCHES
-		cpi		r16, $FE
+		call	SWITCHES		; Flytta eventuellt ut och gör ett gemensamt call för samtliga queries? Eller ska dom kunna kallas separat?
+		;cpi	r16, $FE
+		clz						; SWITCHES verkar sätta Z-flaggan i något steg, så denna behövs efter. Mer rätt med en sbrc innan. Eller kanske vända på sbrs under för färre instruktioner?
+		sbrs	r16, SW_R1		; Kollar om bit SW_R1 (0) i r16 (hämtat från switches) är 0 och sätter då Z-flaggan
+		sez
 		ret
 
 R2Q:
 		call	SWITCHES
-		cpi		r16, $FD
+		cpi		r16, $FD		; Den här sortens maskning funkar enbart om man trycker en knapp i taget, trycker man ner två eller fler knappar kommer ingen att registreras. Alt med andi eller sbrs/sbrc
 		ret
 
 LQ:
-		sbis	PIND, 1
+		sbis	PIND, SW_L
 		sez
 		ret
 
@@ -174,36 +198,58 @@ JOY_LQ:
 		ret
 
 SWITCHES:
-		ldi		r17, ADDR_SWIT
+		ldi		r17, ADDR_SWITCH
 		call	TWI_READ
 		ret
 
 ROTLED_RED:
-		ldi		r17, (ADDR_ROTLED << 1) | 0
+		ldi		r17, ADDR_ROTLED; << 1) | 0
 		ldi		r16, $01						; Obs omvänt röd/grön från hårdvarubeskrivning. Maska eventuellt med en byte i SRAM om LED för L1/L/L2 osv ska användas
 		call	TWI_SEND
 		ret
 
 ROTLED_GREEN:
-		ldi		r17, (ADDR_ROTLED << 1) | 0
+		ldi		r17, ADDR_ROTLED; << 1) | 0
 		ldi		r16, $02						; Obs omvänt röd/grön från hårdvarubeskrivning. Maska eventuellt med en byte i SRAM om LED för L1/L/L2 osv ska användas
 		call	TWI_SEND
 		ret
 
 ROTLED_BOTH:
-		ldi		r17, (ADDR_ROTLED << 1) | 0
+		ldi		r17, ADDR_ROTLED; << 1) | 0
 		ldi		r16, $00
 		call	TWI_SEND
 		ret
 
 ROTLED_OFF:
-		ldi		r17, (ADDR_ROTLED << 1) | 0
+		ldi		r17, ADDR_ROTLED; << 1) | 0
 		ldi		r16, $03
 		call	TWI_SEND
 		ret
 
-RIGHT8_WRITE:						; (OBS GÖR KLART)
+RIGHT8_WRITE:						; Behöver indata i r16, kommer enbart kolla låg nibble
 		andi	r16, $0F			; 0000xxxx
+		call	LOOKUP_7SEG
+		ldi		r17, ADDR_RIGHT8
+		call	TWI_SEND
+		ret
+
+LEFT8_WRITE:						; Behöver indata i r16, kommer enbart kolla låg nibble
+		andi	r16, $0F
+		call	LOOKUP_7SEG
+		ldi		r17, ADDR_LEFT8
+		call	TWI_SEND
+		ret
+
+LOOKUP_7SEG:						; Tar BIN/HEX värde i r16 (0-15) och omvandlar till rätt 7-seg symbol (utan punkt) 
+		push	ZL
+		push	ZH
+		ldi 	ZH,HIGH(TAB_7SEG*2)
+		ldi 	ZL,LOW(TAB_7SEG*2)
+		add 	ZL,r16
+		lpm 	r16,Z
+		pop 	ZH
+		pop 	ZL
+		ret
 
 	; ---------------
 
