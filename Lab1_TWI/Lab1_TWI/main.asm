@@ -35,9 +35,9 @@
 														; $64 = ~1000,03 ms om DELAY=10ms
 														; $3D = ~999,5 ms om DELAY=16ms
 
-7SEG:
+SEVEN_SEG:
 		.db 	$3F, $06, $5B, $4F, $66, $6D, $7D, $07, $7F, $6F, $77, $7C, $39, $5E, $79, $71
-														; LOOKUP-tabell för 0-F i 7-seg (pgfedcba)
+														; LOOKUP-tabell för 0-F i 7-seg (pgfedcba), p=0
 ;::::::::::::::::
 ;	Uppstart
 ;::::::::::::::::
@@ -55,13 +55,34 @@ COLD:
 ;	Huvudprogram
 ;::::::::::::::::
 
+TWI_SEND_TEST:
+		ldi 	ZH, HIGH(SEVEN_SEG*2)
+		ldi 	ZL, LOW(SEVEN_SEG*2)
+		ldi		r18, $0F
+TEST_LOOP:
+		lpm		r16, Z+
+		ldi		r17, SLA_W
+		call	TWI_SEND
+		call	DELAY_N
+		cpi		r18, $00
+		breq	TWI_SEND_TEST
+		dec		r18
+		rjmp	TEST_LOOP
 
-MAIN:
+/*
+		ldi		r16, $71
+		ldi		r17, SLA_W
+		call	TWI_SEND
+		call	DELAY_N
+		rjmp	TWI_SEND_TEST*/
+
+
+HARD_TEST:
 		call	DELAY_N
 		call	HARD_0_TWI_SEND
 		call	DELAY_N
 		call	HARD_7_TWI_SEND
-		rjmp	MAIN
+		rjmp	HARD_TEST
 
 
 ;::::::::::::::::
@@ -112,7 +133,7 @@ HARD_7_TWI_SEND:
 
 		call	SDH		; ACK
 									; Data $07 0b00000111
-		call	SDL					; 0
+		call	SDH					; 0
 		call	SDL					; 0
 		call	SDL					; 0
 		call	SDL					; 0
@@ -130,10 +151,46 @@ HARD_7_TWI_SEND:
 
 TWI_SEND:
 		call	START
-		;call	SEND_ADR			; +R/W'
-									; Släpp SDA för att lyssna på ACK + 1 CP
-		;call	SEND_DATA
+		call	SEND_ADDR			; (+R/W')
+		call	SDH					; Släpp SDA för att lyssna på ACK + 1 CP
+		call	WRITE_BYTE
+		call	SDH					; ACK
 		call	STOP
+		ret
+
+SEND_ADDR:
+		push	r16
+		mov		r16, r17
+		call	WRITE_BYTE
+		pop		r16
+		ret
+
+
+
+WRITE_BYTE:
+		push	r18
+		ldi		r18, $08		
+WRITE_LOOP:
+		call	SEND_BIT
+		dec		r18
+		cpi		r18, $00
+		brne	WRITE_LOOP
+		pop		r18
+		ret
+		
+
+
+SEND_BIT:
+		lsl		r16					; byten som ska skrivas måste vara laddad i r16 innan man gör call
+		brcc	BIT_LOW
+		call	SDH
+		rjmp	BIT_WRITE_DONE
+BIT_LOW:
+		call	SDL
+BIT_WRITE_DONE:
+		ret
+
+
 
 	; ---------------
 
@@ -180,10 +237,12 @@ SDH:
 ;::	Vänterutiner ::
 
 WAIT:
+		push	r16
 		ldi		r16, $34
 W1:
 		dec		r16
 		brne	W1
+		pop		r16
 		ret
 
 	; ---------------
