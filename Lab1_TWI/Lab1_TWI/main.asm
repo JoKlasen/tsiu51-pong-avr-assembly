@@ -4,14 +4,14 @@
 ;
 ; TSIU51 -	Lab1 Two Wire Interface
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klasén, johkl473, Di1b
+;			Johan Klasï¿½n, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
 
 ;::::::::::::::::
-; Övergripande beskrivning av programmet för dokumentation
-; Fyll på här eftersom
+; ï¿½vergripande beskrivning av programmet fï¿½r dokumentation
+; Fyll pï¿½ hï¿½r eftersom
 ;
 ;::::::::::::::::
 
@@ -21,13 +21,14 @@
 ;	Data
 ;::::::::::::::::
 		
-		; Här kan vi köra satta värden som .equ listor och liknande
+		; Hï¿½r kan vi kï¿½ra satta vï¿½rden som .equ listor och liknande
 
+		; Adresser
 		.equ	ADDR_LEFT8	= $24		; IC2
 		.equ	ADDR_RIGHT8	= $25		; IC3
 		.equ	ADDR_ROTLED	= $26		; IC4
 		.equ	ADDR_SWITCH	= $27		; IC5			
-		;.equ	SLA_W		= (ADDR_RIGHT8 << 1) | 0	; $4A 0b01001010
+		.equ	SLA_W		= (ADDR_RIGHT8 << 1) | 0	; $4A 0b01001010
 		;.equ	SLA_R		= (ADDR_RIGHT8 << 1) | 1	; $4B 0b01001011
 
 		; Arduino pins
@@ -45,13 +46,21 @@
 		.equ	JOY_R_SEL	= 4
 		.equ	JOY_L_SEL	= 5
 
-		.equ	N		= $64							; Styr en sekund delay DELAY_N, som går att variera lite
+		.equ	N		= $64							; Styr en sekund delay DELAY_N, som gï¿½r att variera lite
 														; $64 = ~1000,03 ms om DELAY=10ms
 														; $3D = ~999,5 ms om DELAY=16ms
 
+		.equ	TWBR_PRESCALE	= 72
+		; Fï¿½r USART initiering
+		.equ	F_CPU	= 16000000
+		.equ	baud	= 9600					; baudrate
+		.equ	bps		= (F_CPU/16/baud) - 1	; baud prescale
+
+
+
 TAB_7SEG:
 		.db 	$3F, $06, $5B, $4F, $66, $6D, $7D, $07, $7F, $6F, $77, $7C, $39, $5E, $79, $71
-														; LOOKUP-tabell för 0-F i 7-seg (pgfedcba), p=0
+														; LOOKUP-tabell fï¿½r 0-F i 7-seg (pgfedcba), p=0
 ;::::::::::::::::
 ;	Uppstart
 ;::::::::::::::::
@@ -64,7 +73,10 @@ COLD:
 		ldi 	r16, LOW(RAMEND)
 		out 	SPL, r16
 
-		jmp		RIGHT8_COUNTER
+		call	INIT_TWI
+		;call	INIT_USART
+
+		jmp		KEY_TEST2
 
 ;::::::::::::::::
 ;	Huvudprogram
@@ -74,6 +86,7 @@ RIGHT8_COUNTER:
 		ldi		r18, $00
 RCOUNTER_LOOP:
 		mov		r16, r18
+		;call	UART_SEND
 		call	RIGHT8_WRITE
 		call	DELAY_N
 		cpi		r18, $0F
@@ -95,12 +108,12 @@ TEST_LOOP:
 		dec		r18
 		rjmp	TEST_LOOP
 
-/*
+TWI_SEND_TEST2:
 		ldi		r16, $71
-		ldi		r17, SLA_W
+		ldi		r17, ADDR_RIGHT8
 		call	TWI_SEND
 		call	DELAY_N
-		rjmp	TWI_SEND_TEST*/
+		rjmp	TWI_SEND_TEST2
 
 
 HARD_TEST:
@@ -160,16 +173,16 @@ RQ:
 
 
 R1Q:
-		call	SWITCHES		; Flytta eventuellt ut och gör ett gemensamt call för samtliga queries? Eller ska dom kunna kallas separat?
+		call	SWITCHES		; Flytta eventuellt ut och gï¿½r ett gemensamt call fï¿½r samtliga queries? Eller ska dom kunna kallas separat?
 		;cpi	r16, $FE
-		clz						; SWITCHES verkar sätta Z-flaggan i något steg, så denna behövs efter. Mer rätt med en sbrc innan. Eller kanske vända på sbrs under för färre instruktioner?
-		sbrs	r16, SW_R1		; Kollar om bit SW_R1 (0) i r16 (hämtat från switches) är 0 och sätter då Z-flaggan
+		clz						; SWITCHES verkar sï¿½tta Z-flaggan i nï¿½got steg, sï¿½ denna behï¿½vs efter. Mer rï¿½tt med en sbrc innan. Eller kanske vï¿½nda pï¿½ sbrs under fï¿½r fï¿½rre instruktioner?
+		sbrs	r16, SW_R1		; Kollar om bit SW_R1 (0) i r16 (hï¿½mtat frï¿½n switches) ï¿½r 0 och sï¿½tter dï¿½ Z-flaggan
 		sez
 		ret
 
 R2Q:
 		call	SWITCHES
-		cpi		r16, $FD		; Den här sortens maskning funkar enbart om man trycker en knapp i taget, trycker man ner två eller fler knappar kommer ingen att registreras. Alt med andi eller sbrs/sbrc
+		cpi		r16, $FD		; Den hï¿½r sortens maskning funkar enbart om man trycker en knapp i taget, trycker man ner tvï¿½ eller fler knappar kommer ingen att registreras. Alt med andi eller sbrs/sbrc
 		ret
 
 LQ:
@@ -204,13 +217,13 @@ SWITCHES:
 
 ROTLED_RED:
 		ldi		r17, ADDR_ROTLED; << 1) | 0
-		ldi		r16, $01						; Obs omvänt röd/grön från hårdvarubeskrivning. Maska eventuellt med en byte i SRAM om LED för L1/L/L2 osv ska användas
+		ldi		r16, $01						; Obs omvï¿½nt rï¿½d/grï¿½n frï¿½n hï¿½rdvarubeskrivning. Maska eventuellt med en byte i SRAM om LED fï¿½r L1/L/L2 osv ska anvï¿½ndas
 		call	TWI_SEND
 		ret
 
 ROTLED_GREEN:
 		ldi		r17, ADDR_ROTLED; << 1) | 0
-		ldi		r16, $02						; Obs omvänt röd/grön från hårdvarubeskrivning. Maska eventuellt med en byte i SRAM om LED för L1/L/L2 osv ska användas
+		ldi		r16, $02						; Obs omvï¿½nt rï¿½d/grï¿½n frï¿½n hï¿½rdvarubeskrivning. Maska eventuellt med en byte i SRAM om LED fï¿½r L1/L/L2 osv ska anvï¿½ndas
 		call	TWI_SEND
 		ret
 
@@ -226,21 +239,21 @@ ROTLED_OFF:
 		call	TWI_SEND
 		ret
 
-RIGHT8_WRITE:						; Behöver indata i r16, kommer enbart kolla låg nibble
+RIGHT8_WRITE:						; Behï¿½ver indata i r16, kommer enbart kolla lï¿½g nibble
 		andi	r16, $0F			; 0000xxxx
 		call	LOOKUP_7SEG
 		ldi		r17, ADDR_RIGHT8
 		call	TWI_SEND
 		ret
 
-LEFT8_WRITE:						; Behöver indata i r16, kommer enbart kolla låg nibble
+LEFT8_WRITE:						; Behï¿½ver indata i r16, kommer enbart kolla lï¿½g nibble
 		andi	r16, $0F
 		call	LOOKUP_7SEG
 		ldi		r17, ADDR_LEFT8
 		call	TWI_SEND
 		ret
 
-LOOKUP_7SEG:						; Tar BIN/HEX värde i r16 (0-15) och omvandlar till rätt 7-seg symbol (utan punkt) 
+LOOKUP_7SEG:						; Tar BIN/HEX vï¿½rde i r16 (0-15) och omvandlar till rï¿½tt 7-seg symbol (utan punkt) 
 		push	ZL
 		push	ZH
 		ldi 	ZH,HIGH(TAB_7SEG*2)
@@ -253,25 +266,41 @@ LOOKUP_7SEG:						; Tar BIN/HEX värde i r16 (0-15) och omvandlar till rätt 7-seg
 
 	; ---------------
 
-TWI_READ:							; Argument: in=Adress (7bits) i r17, ut=data i r16
-		lsl		r17
-		ori		r17, $01
+TWI_SEND:
+		lsl 	r17
 		call	START
-		call	SEND_ADDR			; (+R)
-		call	SCP					; Släpp SDA för att lyssna på ACK + 1 CP
-		call	READ_BYTE
-		call	SDL					; ACK
-		call	STOP
+		call 	TWI_WAIT
+		call	SEND_ADDR
+		call 	TWI_WAIT
+		call 	WRITE_BYTE
+		call	TWI_WAIT
+		call 	STOP
 		ret
 
-TWI_SEND:							; Argument: in=Adress (7bits) i r17, in=data i r16
-		lsl		r17
+TWI_READ:
+		lsl 	r17
+		ori 	r17, $01
 		call	START
-		call	SEND_ADDR			; (+W')
-		call	SDH					; Släpp SDA för att lyssna på ACK + 1 CP
-		call	WRITE_BYTE
-		call	SDH					; ACK
-		call	STOP
+		call 	TWI_WAIT
+		call	SEND_ADDR
+		call 	TWI_WAIT
+		call 	READ_BYTE
+		call	TWI_WAIT
+		call 	STOP
+		ret
+
+START:
+		push	r18
+		ldi 	r18, (1<<TWINT)|(1<<TWSTA)|(1<<TWEN)
+		sts 	TWCR, r18
+		pop 	r18
+		ret
+
+STOP:
+		push	r18
+		ldi 	r18, (1<<TWINT)|(1<<TWEN)|(1<<TWSTO)
+		sts 	TWCR, r18
+		pop 	r18
 		ret
 
 SEND_ADDR:
@@ -281,99 +310,168 @@ SEND_ADDR:
 		pop		r16
 		ret
 
-READ_BYTE:
+TWI_WAIT:
 		push	r18
-		ldi		r18, $08
-		clr		r16		
-READ_LOOP:
-		call	READ_BIT
-		dec		r18
-		cpi		r18, $00
-		brne	READ_LOOP
-		pop		r18
+	TWI_WAIT_LOOP:	
+		lds  	r18,TWCR
+		sbrs 	r18,TWINT
+		rjmp 	TWI_WAIT_LOOP
+		pop 	r18
 		ret
 
 WRITE_BYTE:
 		push	r18
-		ldi		r18, $08		
-WRITE_LOOP:
-		call	SEND_BIT
-		dec		r18
-		cpi		r18, $00
-		brne	WRITE_LOOP
-		pop		r18
+		sts 	TWDR, r16
+		ldi 	r18, (1<<TWINT)|(1<<TWEN)
+		sts 	TWCR, r18
+		pop 	r18
 		ret
+
+READ_BYTE:
+		push	r18		
+		ldi 	r18, (1<<TWINT)|(1<<TWEN)|(1<<TWEA)
+		sts 	TWCR, r18
+		call 	TWI_WAIT
+		lds 	r16, TWDR
+		pop 	r18
+		ret
+
+
+; Icke hÃ¥rdvaru-stÃ¶dd TWI
+
+; TWI_READ:							; Argument: in=Adress (7bits) i r17, ut=data i r16
+; 		lsl		r17
+; 		ori		r17, $01
+; 		call	START
+; 		call	SEND_ADDR			; (+R)
+; 		call	SCP					; Slï¿½pp SDA fï¿½r att lyssna pï¿½ ACK + 1 CP
+; 		call	READ_BYTE
+; 		call	SDL					; ACK
+; 		call	STOP
+; 		ret
+
+; TWI_SEND:							; Argument: in=Adress (7bits) i r17, in=data i r16
+; 		lsl		r17
+; 		call	START
+; 		call	SEND_ADDR			; (+W')
+; 		call	SDH					; Slï¿½pp SDA fï¿½r att lyssna pï¿½ ACK + 1 CP
+; 		call	WRITE_BYTE
+; 		call	SDH					; ACK
+; 		call	STOP
+; 		ret
+
+; SEND_ADDR:
+; 		push	r16
+; 		mov		r16, r17
+; 		call	WRITE_BYTE
+; 		pop		r16
+; 		ret
+
+; READ_BYTE:
+; 		push	r18
+; 		ldi		r18, $08
+; 		clr		r16		
+; READ_LOOP:
+; 		call	READ_BIT
+; 		dec		r18
+; 		cpi		r18, $00
+; 		brne	READ_LOOP
+; 		pop		r18
+; 		ret
+
+; WRITE_BYTE:
+; 		push	r18
+; 		ldi		r18, $08		
+; WRITE_LOOP:
+; 		call	SEND_BIT
+; 		dec		r18
+; 		cpi		r18, $00
+; 		brne	WRITE_LOOP
+; 		pop		r18
+; 		ret
 		
-READ_BIT:
-		lsl		r16
-		sbic	PINC, 4		
-		ori		r16, $01
-		call	SCP
+; READ_BIT:
+; 		lsl		r16
+; 		sbic	PINC, 4		
+; 		ori		r16, $01
+; 		call	SCP
+; 		ret
+
+
+; SEND_BIT:
+; 		lsl		r16					; byten som ska skrivas mï¿½ste vara laddad i r16 innan man gï¿½r call
+; 		brcc	BIT_LOW
+; 		call	SDH
+; 		rjmp	BIT_WRITE_DONE
+; BIT_LOW:
+; 		call	SDL
+; BIT_WRITE_DONE:
+; 		ret
+
+
+
+; 	; ---------------
+
+; START:
+; 		sbi		DDRC, SDA
+; 		call	WAIT
+; 		sbi		DDRC, SCL
+; 		call	WAIT
+; 		ret
+
+; 	; ---------------
+
+; STOP:
+; 		sbi		DDRC, SDA
+; 		call	WAIT
+; 		cbi		DDRC, SCL
+; 		call	WAIT
+; 		cbi		DDRC, SDA
+; 		call	WAIT
+; 		ret
+
+; 	; ---------------
+
+; SDL:
+; 		sbi		DDRC, SDA
+; 		call	WAIT
+; 		cbi		DDRC, SCL
+; 		call	WAIT
+; 		sbi		DDRC, SCL
+; 		call	WAIT
+; 		ret
+
+; 	; ---------------
+
+; SDH:
+; 		cbi		DDRC, SDA
+; 		call	WAIT
+; 		cbi		DDRC, SCL
+; 		call	WAIT
+; 		sbi		DDRC, SCL
+; 		call	WAIT
+; 		ret
+
+; SCP:
+; 		cbi		DDRC, SCL
+; 		call	WAIT
+; 		sbi		DDRC, SCL
+; 		call	WAIT
+; 		ret
+
+UART_SEND:							; r16 som indata fï¿½r det som ska skickas
+		lds		r17,UCSR0A			; load UCSR0A into r17
+		sbrs	r17,UDRE0			; wait for empty transmit buffer
+		rjmp	UART_SEND			; repeat loop
+
+		mov		r19, r16
+		ldi		r20, $30
+		add		r19, r20
+		sts		UDR0,r19			; transmit character
+
 		ret
 
-
-SEND_BIT:
-		lsl		r16					; byten som ska skrivas måste vara laddad i r16 innan man gör call
-		brcc	BIT_LOW
-		call	SDH
-		rjmp	BIT_WRITE_DONE
-BIT_LOW:
-		call	SDL
-BIT_WRITE_DONE:
-		ret
-
-
-
-	; ---------------
-
-START:
-		sbi		DDRC, SDA
-		call	WAIT
-		sbi		DDRC, SCL
-		call	WAIT
-		ret
-
-	; ---------------
-
-STOP:
-		sbi		DDRC, SDA
-		call	WAIT
-		cbi		DDRC, SCL
-		call	WAIT
-		cbi		DDRC, SDA
-		call	WAIT
-		ret
-
-	; ---------------
-
-SDL:
-		sbi		DDRC, SDA
-		call	WAIT
-		cbi		DDRC, SCL
-		call	WAIT
-		sbi		DDRC, SCL
-		call	WAIT
-		ret
-
-	; ---------------
-
-SDH:
-		cbi		DDRC, SDA
-		call	WAIT
-		cbi		DDRC, SCL
-		call	WAIT
-		sbi		DDRC, SCL
-		call	WAIT
-		ret
-
-SCP:
-		cbi		DDRC, SCL
-		call	WAIT
-		sbi		DDRC, SCL
-		call	WAIT
-		ret
-
-;::	Vänterutiner ::
+;::	Vï¿½nterutiner ::
 
 WAIT:
 		push	r16
@@ -386,7 +484,7 @@ W1:
 
 	; ---------------
 
-DELAY_N:						; Längre vänteloop, styrt av N som är definerat i början under "Data".
+DELAY_N:						; Lï¿½ngre vï¿½nteloop, styrt av N som ï¿½r definerat i bï¿½rjan under "Data".
 		push	r16
 		ldi		r16, N
 DELAY_N1:
@@ -399,10 +497,10 @@ DELAY_N1:
 	; ---------------
 
 DELAY:						
-								; Vänte-loop, upp till ~16 ms ($FFFF, här 10 ms
+								; Vï¿½nte-loop, upp till ~16 ms ($FFFF, hï¿½r 10 ms
 		push	r25
 		push	r24
-		ldi 	r25, $63		; $63C4 ger 160000 cykler för hela rutinen, i princip exakt 10.0 ms
+		ldi 	r25, $63		; $63C4 ger 160000 cykler fï¿½r hela rutinen, i princip exakt 10.0 ms
 		ldi 	r24, $C4	
 D1:
 		adiw	r24, 1
@@ -410,3 +508,24 @@ D1:
 		pop		r24
 		pop		r25
 		ret
+
+
+INIT_TWI:
+		ldi		r16, TWBR_PRESCALE
+		sts		TWBR, r16
+		lds		r16, TWSR
+		andi	r16, $FC
+		sts		TWSR, r16
+		ret
+
+INIT_USART:
+		ldi		r16,LOW(bps)		; load baud prescale
+		ldi		r17,HIGH(bps)
+	
+		sts		UBRR0L,r16			; load baud prescale
+		sts		UBRR0H,r17			; to UBRR0
+
+		ldi		r16, (1<<RXEN0)|(1<<TXEN0)		; enable transmitter "(1<<RXEN0)|" fï¿½r receiver ocksï¿½
+		sts		UCSR0B,r16			; and receiver
+
+		ret	
