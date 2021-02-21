@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.7  C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm Mon Jan 25 13:13:16 2021
+AVRASM ver. 2.2.7  C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm Fri Feb 12 10:38:09 2021
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\avrasm\inc\m328pdef.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\avrasm\inc\m328pdef.inc'
@@ -990,59 +990,537 @@ AVRASM ver. 2.2.7  C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.
                                  ;
                                  ; TSIU51 -	Lab1 Two Wire Interface
                                  ; Author :	Oskar Lundh, osklu130, Di1b 
-                                 ;			Johan Klasén, johkl473, Di1b
+                                 ;			Johan Klasï¿½n, johkl473, Di1b
                                  ;
                                  ;::::::::::::::::::::::::::::::::::::::::::::
                                  
-                                 ; Övergripande beskrivning av programmet för dokumentation
+                                 
+                                 ;::::::::::::::::
+                                 ; ï¿½vergripande beskrivning av programmet fï¿½r dokumentation
+                                 ; Fyll pï¿½ hï¿½r eftersom
                                  ;
-                                 ;
+                                 ;::::::::::::::::
+                                 
+000000 940c 000a                 		jmp		COLD
                                  
                                  ;::::::::::::::::
                                  ;	Data
                                  ;::::::::::::::::
+                                 		
+                                 		; Hï¿½r kan vi kï¿½ra satta vï¿½rden som .equ listor och liknande
                                  
-                                 										; Här kan vi köra satta värden som .equ listor och liknande
+                                 		; Adresser
+                                 		.equ	ADDR_LEFT8	= $24		; IC2
+                                 		.equ	ADDR_RIGHT8	= $25		; IC3
+                                 		.equ	ADDR_ROTLED	= $26		; IC4
+                                 		.equ	ADDR_SWITCH	= $27		; IC5			
+                                 		.equ	SLA_W		= (ADDR_RIGHT8 << 1) | 0	; $4A 0b01001010
+                                 		;.equ	SLA_R		= (ADDR_RIGHT8 << 1) | 1	; $4B 0b01001011
+                                 
+                                 		; Arduino pins
+                                 		.equ	SCL			= PC5
+                                 		.equ	SDA			= PC4
+                                 
+                                 		.equ	SW_R		= PD0
+                                 		.equ	SW_L		= PD1
+                                 
+                                 		; IC5, SWITCH 
+                                 		.equ	SW_R1		= 0
+                                 		.equ	SW_R2		= 1
+                                 		.equ	SW_L1		= 2
+                                 		.equ	SW_L2		= 3
+                                 		.equ	JOY_R_SEL	= 4
+                                 		.equ	JOY_L_SEL	= 5
+                                 
+                                 		.equ	N		= $64							; Styr en sekund delay DELAY_N, som gï¿½r att variera lite
+                                 														; $64 = ~1000,03 ms om DELAY=10ms
+                                 														; $3D = ~999,5 ms om DELAY=16ms
+                                 
+                                 		.equ	TWBR_PRESCALE	= 72
+                                 		; Fï¿½r USART initiering
+                                 		.equ	F_CPU	= 16000000
+                                 		.equ	baud	= 9600					; baudrate
+                                 		.equ	bps		= (F_CPU/16/baud) - 1	; baud prescale
                                  
                                  
+                                 
+                                 TAB_7SEG:
+000002 063f
+000003 4f5b
+000004 6d66
+000005 077d
+000006 6f7f
+000007 7c77
+000008 5e39
+000009 7179                      		.db 	$3F, $06, $5B, $4F, $66, $6D, $7D, $07, $7F, $6F, $77, $7C, $39, $5E, $79, $71
+                                 														; LOOKUP-tabell fï¿½r 0-F i 7-seg (pgfedcba), p=0
                                  ;::::::::::::::::
                                  ;	Uppstart
                                  ;::::::::::::::::
                                  
                                  
-                                 START:
-                                 										; Initiera stackpekaren
-000000 e008                      		ldi 	r16, HIGH(RAMEND)
-000001 bf0e                      		out 	SPH, r16
-000002 ef0f                      		ldi 	r16, LOW(RAMEND)
-000003 bf0d                      		out 	SPL, r16
+                                 COLD:
+                                 														; Initiera stackpekaren
+00000a e008                      		ldi 	r16, HIGH(RAMEND)
+00000b bf0e                      		out 	SPH, r16
+00000c ef0f                      		ldi 	r16, LOW(RAMEND)
+00000d bf0d                      		out 	SPL, r16
                                  
+00000e 940e 0123                 		call	INIT_TWI
+                                 		;call	INIT_USART
+                                 
+000010 940c 0049                 		jmp		KEY_TEST2
                                  
                                  ;::::::::::::::::
                                  ;	Huvudprogram
                                  ;::::::::::::::::
                                  
+                                 RIGHT8_COUNTER:
+000012 e020                      		ldi		r18, $00
+                                 RCOUNTER_LOOP:
+000013 2f02                      		mov		r16, r18
+                                 		;call	UART_SEND
+000014 940e 009f                 		call	RIGHT8_WRITE
+000016 940e 0112                 		call	DELAY_N
+000018 302f                      		cpi		r18, $0F
+000019 f3c1                      		breq	RIGHT8_COUNTER
+00001a 9523                      		inc		r18
+00001b cff7                      		rjmp	RCOUNTER_LOOP
                                  
-                                 MAIN:
-000004 940e 0007                 		call	WAIT
-000006 cffd                      		rjmp	MAIN
+                                 TWI_SEND_TEST:
+00001c e0f0                      		ldi 	ZH, HIGH(TAB_7SEG*2)
+00001d e0e4                      		ldi 	ZL, LOW(TAB_7SEG*2)
+00001e e02f                      		ldi		r18, $0F
+                                 TEST_LOOP:
+00001f 9105                      		lpm		r16, Z+
+000020 e215                      		ldi		r17, ADDR_RIGHT8
+000021 940e 00b6                 		call	TWI_SEND
+000023 940e 0112                 		call	DELAY_N
+000025 3020                      		cpi		r18, $00
+000026 f3a9                      		breq	TWI_SEND_TEST
+000027 952a                      		dec		r18
+000028 cff6                      		rjmp	TEST_LOOP
                                  
+                                 TWI_SEND_TEST2:
+000029 e701                      		ldi		r16, $71
+00002a e215                      		ldi		r17, ADDR_RIGHT8
+00002b 940e 00b6                 		call	TWI_SEND
+00002d 940e 0112                 		call	DELAY_N
+00002f cff9                      		rjmp	TWI_SEND_TEST2
+                                 
+                                 
+                                 HARD_TEST:
+000030 940e 0112                 		call	DELAY_N
+000032 940e 008b                 		call	ROTLED_RED
+000034 940e 0112                 		call	DELAY_N
+000036 940e 009a                 		call	ROTLED_OFF
+000038 cff7                      		rjmp	HARD_TEST
+                                 
+                                 READ_TEST:
+000039 e217                      		ldi		r17, ADDR_SWITCH
+00003a 940e 00c6                 		call	TWI_READ
+00003c e215                      		ldi		r17, ADDR_RIGHT8
+00003d 940e 00b6                 		call	TWI_SEND
+00003f cff9                      		rjmp	READ_TEST
+                                 
+                                 KEY_TEST:
+000040 940e 0077                 		call	L1Q
+000042 f419                      		brne	NO_KEY
+000043 940e 0095                 		call	ROTLED_BOTH
+000045 cffa                      		rjmp	KEY_TEST
+                                 NO_KEY:
+000046 940e 009a                 		call	ROTLED_OFF
+000048 cff7                      		rjmp	KEY_TEST
+                                 
+                                 KEY_TEST2:
+000049 940e 0077                 		call	L1Q
+00004b f0c1                      		breq	KEY_PRESSED
+00004c 940e 007b                 		call	L2Q
+00004e f0a9                      		breq	KEY_PRESSED
+00004f 940e 006a                 		call	R1Q
+000051 f091                      		breq	KEY_PRESSED
+000052 940e 0070                 		call	R2Q
+000054 f079                      		breq	KEY_PRESSED
+000055 940e 0083                 		call	JOY_LQ
+000057 f061                      		breq	KEY_PRESSED
+000058 940e 007f                 		call	JOY_RQ
+00005a f049                      		breq	KEY_PRESSED
+00005b 940e 0067                 		call	RQ
+00005d f031                      		breq	KEY_PRESSED
+00005e 940e 0074                 		call	LQ
+000060 f019                      		breq	KEY_PRESSED
+000061 940e 009a                 		call	ROTLED_OFF
+000063 cfe5                      		rjmp	KEY_TEST2
+                                 KEY_PRESSED:
+000064 940e 0095                 		call	ROTLED_BOTH
+000066 cfe2                      		rjmp	KEY_TEST2
                                  
                                  ;::::::::::::::::
                                  ;	Subrutiner
                                  ;::::::::::::::::
                                  
-                                 WAIT:						
-                                 							; Vänte-loop, upp till ~16 ms
-000007 939f                      		push	r25
-000008 938f                      		push	r24
-000009 ef9e                      		ldi 	r25, $FE	; $63C4 ger 160000 cykler för hela rutinen, i princip exakt 10.0 ms, $09FA ~ 10 µs
-00000a e68f                      		ldi 	r24, $6F	
+                                 RQ:
+000067 9b48                      		sbis	PIND, SW_R
+000068 9418                      		sez
+000069 9508                      		ret
+                                 
+                                 
+                                 R1Q:
+00006a 940e 0087                 		call	SWITCHES		; Flytta eventuellt ut och gï¿½r ett gemensamt call fï¿½r samtliga queries? Eller ska dom kunna kallas separat?
+                                 		;cpi	r16, $FE
+00006c 9498                      		clz						; SWITCHES verkar sï¿½tta Z-flaggan i nï¿½got steg, sï¿½ denna behï¿½vs efter. Mer rï¿½tt med en sbrc innan. Eller kanske vï¿½nda pï¿½ sbrs under fï¿½r fï¿½rre instruktioner?
+00006d ff00                      		sbrs	r16, SW_R1		; Kollar om bit SW_R1 (0) i r16 (hï¿½mtat frï¿½n switches) ï¿½r 0 och sï¿½tter dï¿½ Z-flaggan
+00006e 9418                      		sez
+00006f 9508                      		ret
+                                 
+                                 R2Q:
+000070 940e 0087                 		call	SWITCHES
+000072 3f0d                      		cpi		r16, $FD		; Den hï¿½r sortens maskning funkar enbart om man trycker en knapp i taget, trycker man ner tvï¿½ eller fler knappar kommer ingen att registreras. Alt med andi eller sbrs/sbrc
+000073 9508                      		ret
+                                 
+                                 LQ:
+000074 9b49                      		sbis	PIND, SW_L
+000075 9418                      		sez
+000076 9508                      		ret
+                                 
+                                 L1Q:
+000077 940e 0087                 		call	SWITCHES
+000079 3f0b                      		cpi		r16, $FB
+00007a 9508                      		ret
+                                 
+                                 L2Q:
+00007b 940e 0087                 		call	SWITCHES
+00007d 3f07                      		cpi		r16, $F7
+00007e 9508                      		ret
+                                 
+                                 JOY_RQ:
+00007f 940e 0087                 		call	SWITCHES
+000081 3e0f                      		cpi		r16, $EF
+000082 9508                      		ret
+                                 
+                                 JOY_LQ:
+000083 940e 0087                 		call	SWITCHES
+000085 3d0f                      		cpi		r16, $DF
+000086 9508                      		ret
+                                 
+                                 SWITCHES:
+000087 e217                      		ldi		r17, ADDR_SWITCH
+000088 940e 00c6                 		call	TWI_READ
+00008a 9508                      		ret
+                                 
+                                 ROTLED_RED:
+00008b e216                      		ldi		r17, ADDR_ROTLED; << 1) | 0
+00008c e001                      		ldi		r16, $01						; Obs omvï¿½nt rï¿½d/grï¿½n frï¿½n hï¿½rdvarubeskrivning. Maska eventuellt med en byte i SRAM om LED fï¿½r L1/L/L2 osv ska anvï¿½ndas
+00008d 940e 00b6                 		call	TWI_SEND
+00008f 9508                      		ret
+                                 
+                                 ROTLED_GREEN:
+000090 e216                      		ldi		r17, ADDR_ROTLED; << 1) | 0
+000091 e002                      		ldi		r16, $02						; Obs omvï¿½nt rï¿½d/grï¿½n frï¿½n hï¿½rdvarubeskrivning. Maska eventuellt med en byte i SRAM om LED fï¿½r L1/L/L2 osv ska anvï¿½ndas
+000092 940e 00b6                 		call	TWI_SEND
+000094 9508                      		ret
+                                 
+                                 ROTLED_BOTH:
+000095 e216                      		ldi		r17, ADDR_ROTLED; << 1) | 0
+000096 e000                      		ldi		r16, $00
+000097 940e 00b6                 		call	TWI_SEND
+000099 9508                      		ret
+                                 
+                                 ROTLED_OFF:
+00009a e216                      		ldi		r17, ADDR_ROTLED; << 1) | 0
+00009b e003                      		ldi		r16, $03
+00009c 940e 00b6                 		call	TWI_SEND
+00009e 9508                      		ret
+                                 
+                                 RIGHT8_WRITE:						; Behï¿½ver indata i r16, kommer enbart kolla lï¿½g nibble
+00009f 700f                      		andi	r16, $0F			; 0000xxxx
+0000a0 940e 00ad                 		call	LOOKUP_7SEG
+0000a2 e215                      		ldi		r17, ADDR_RIGHT8
+0000a3 940e 00b6                 		call	TWI_SEND
+0000a5 9508                      		ret
+                                 
+                                 LEFT8_WRITE:						; Behï¿½ver indata i r16, kommer enbart kolla lï¿½g nibble
+0000a6 700f                      		andi	r16, $0F
+0000a7 940e 00ad                 		call	LOOKUP_7SEG
+0000a9 e214                      		ldi		r17, ADDR_LEFT8
+0000aa 940e 00b6                 		call	TWI_SEND
+0000ac 9508                      		ret
+                                 
+                                 LOOKUP_7SEG:						; Tar BIN/HEX vï¿½rde i r16 (0-15) och omvandlar till rï¿½tt 7-seg symbol (utan punkt) 
+0000ad 93ef                      		push	ZL
+0000ae 93ff                      		push	ZH
+0000af e0f0                      		ldi 	ZH,HIGH(TAB_7SEG*2)
+0000b0 e0e4                      		ldi 	ZL,LOW(TAB_7SEG*2)
+0000b1 0fe0                      		add 	ZL,r16
+0000b2 9104                      		lpm 	r16,Z
+0000b3 91ff                      		pop 	ZH
+0000b4 91ef                      		pop 	ZL
+0000b5 9508                      		ret
+                                 
+                                 	; ---------------
+                                 
+                                 TWI_SEND:
+0000b6 0f11                      		lsl 	r17
+0000b7 940e 00d7                 		call	START
+0000b9 940e 00e9                 		call 	TWI_WAIT
+0000bb 940e 00e3                 		call	SEND_ADDR
+0000bd 940e 00e9                 		call 	TWI_WAIT
+0000bf 940e 00f0                 		call 	WRITE_BYTE
+0000c1 940e 00e9                 		call	TWI_WAIT
+0000c3 940e 00dd                 		call 	STOP
+0000c5 9508                      		ret
+                                 
+                                 TWI_READ:
+0000c6 0f11                      		lsl 	r17
+0000c7 6011                      		ori 	r17, $01
+0000c8 940e 00d7                 		call	START
+0000ca 940e 00e9                 		call 	TWI_WAIT
+0000cc 940e 00e3                 		call	SEND_ADDR
+0000ce 940e 00e9                 		call 	TWI_WAIT
+0000d0 940e 00f8                 		call 	READ_BYTE
+0000d2 940e 00e9                 		call	TWI_WAIT
+0000d4 940e 00dd                 		call 	STOP
+0000d6 9508                      		ret
+                                 
+                                 START:
+0000d7 932f                      		push	r18
+0000d8 ea24                      		ldi 	r18, (1<<TWINT)|(1<<TWSTA)|(1<<TWEN)
+0000d9 9320 00bc                 		sts 	TWCR, r18
+0000db 912f                      		pop 	r18
+0000dc 9508                      		ret
+                                 
+                                 STOP:
+0000dd 932f                      		push	r18
+0000de e924                      		ldi 	r18, (1<<TWINT)|(1<<TWEN)|(1<<TWSTO)
+0000df 9320 00bc                 		sts 	TWCR, r18
+0000e1 912f                      		pop 	r18
+0000e2 9508                      		ret
+                                 
+                                 SEND_ADDR:
+0000e3 930f                      		push	r16
+0000e4 2f01                      		mov		r16, r17
+0000e5 940e 00f0                 		call	WRITE_BYTE
+0000e7 910f                      		pop		r16
+0000e8 9508                      		ret
+                                 
+                                 TWI_WAIT:
+0000e9 932f                      		push	r18
+                                 	TWI_WAIT_LOOP:	
+0000ea 9120 00bc                 		lds  	r18,TWCR
+0000ec ff27                      		sbrs 	r18,TWINT
+0000ed cffc                      		rjmp 	TWI_WAIT_LOOP
+0000ee 912f                      		pop 	r18
+0000ef 9508                      		ret
+                                 
+                                 WRITE_BYTE:
+0000f0 932f                      		push	r18
+0000f1 9300 00bb                 		sts 	TWDR, r16
+0000f3 e824                      		ldi 	r18, (1<<TWINT)|(1<<TWEN)
+0000f4 9320 00bc                 		sts 	TWCR, r18
+0000f6 912f                      		pop 	r18
+0000f7 9508                      		ret
+                                 
+                                 READ_BYTE:
+0000f8 932f                      		push	r18		
+0000f9 ec24                      		ldi 	r18, (1<<TWINT)|(1<<TWEN)|(1<<TWEA)
+0000fa 9320 00bc                 		sts 	TWCR, r18
+0000fc 940e 00e9                 		call 	TWI_WAIT
+0000fe 9100 00bb                 		lds 	r16, TWDR
+000100 912f                      		pop 	r18
+000101 9508                      		ret
+                                 
+                                 
+                                 ; Icke hÃ¥rdvaru-stÃ¶dd TWI
+                                 
+                                 ; TWI_READ:							; Argument: in=Adress (7bits) i r17, ut=data i r16
+                                 ; 		lsl		r17
+                                 ; 		ori		r17, $01
+                                 ; 		call	START
+                                 ; 		call	SEND_ADDR			; (+R)
+                                 ; 		call	SCP					; Slï¿½pp SDA fï¿½r att lyssna pï¿½ ACK + 1 CP
+                                 ; 		call	READ_BYTE
+                                 ; 		call	SDL					; ACK
+                                 ; 		call	STOP
+                                 ; 		ret
+                                 
+                                 ; TWI_SEND:							; Argument: in=Adress (7bits) i r17, in=data i r16
+                                 ; 		lsl		r17
+                                 ; 		call	START
+                                 ; 		call	SEND_ADDR			; (+W')
+                                 ; 		call	SDH					; Slï¿½pp SDA fï¿½r att lyssna pï¿½ ACK + 1 CP
+                                 ; 		call	WRITE_BYTE
+                                 ; 		call	SDH					; ACK
+                                 ; 		call	STOP
+                                 ; 		ret
+                                 
+                                 ; SEND_ADDR:
+                                 ; 		push	r16
+                                 ; 		mov		r16, r17
+                                 ; 		call	WRITE_BYTE
+                                 ; 		pop		r16
+                                 ; 		ret
+                                 
+                                 ; READ_BYTE:
+                                 ; 		push	r18
+                                 ; 		ldi		r18, $08
+                                 ; 		clr		r16		
+                                 ; READ_LOOP:
+                                 ; 		call	READ_BIT
+                                 ; 		dec		r18
+                                 ; 		cpi		r18, $00
+                                 ; 		brne	READ_LOOP
+                                 ; 		pop		r18
+                                 ; 		ret
+                                 
+                                 ; WRITE_BYTE:
+                                 ; 		push	r18
+                                 ; 		ldi		r18, $08		
+                                 ; WRITE_LOOP:
+                                 ; 		call	SEND_BIT
+                                 ; 		dec		r18
+                                 ; 		cpi		r18, $00
+                                 ; 		brne	WRITE_LOOP
+                                 ; 		pop		r18
+                                 ; 		ret
+                                 		
+                                 ; READ_BIT:
+                                 ; 		lsl		r16
+                                 ; 		sbic	PINC, 4		
+                                 ; 		ori		r16, $01
+                                 ; 		call	SCP
+                                 ; 		ret
+                                 
+                                 
+                                 ; SEND_BIT:
+                                 ; 		lsl		r16					; byten som ska skrivas mï¿½ste vara laddad i r16 innan man gï¿½r call
+                                 ; 		brcc	BIT_LOW
+                                 ; 		call	SDH
+                                 ; 		rjmp	BIT_WRITE_DONE
+                                 ; BIT_LOW:
+                                 ; 		call	SDL
+                                 ; BIT_WRITE_DONE:
+                                 ; 		ret
+                                 
+                                 
+                                 
+                                 ; 	; ---------------
+                                 
+                                 ; START:
+                                 ; 		sbi		DDRC, SDA
+                                 ; 		call	WAIT
+                                 ; 		sbi		DDRC, SCL
+                                 ; 		call	WAIT
+                                 ; 		ret
+                                 
+                                 ; 	; ---------------
+                                 
+                                 ; STOP:
+                                 ; 		sbi		DDRC, SDA
+                                 ; 		call	WAIT
+                                 ; 		cbi		DDRC, SCL
+                                 ; 		call	WAIT
+                                 ; 		cbi		DDRC, SDA
+                                 ; 		call	WAIT
+                                 ; 		ret
+                                 
+                                 ; 	; ---------------
+                                 
+                                 ; SDL:
+                                 ; 		sbi		DDRC, SDA
+                                 ; 		call	WAIT
+                                 ; 		cbi		DDRC, SCL
+                                 ; 		call	WAIT
+                                 ; 		sbi		DDRC, SCL
+                                 ; 		call	WAIT
+                                 ; 		ret
+                                 
+                                 ; 	; ---------------
+                                 
+                                 ; SDH:
+                                 ; 		cbi		DDRC, SDA
+                                 ; 		call	WAIT
+                                 ; 		cbi		DDRC, SCL
+                                 ; 		call	WAIT
+                                 ; 		sbi		DDRC, SCL
+                                 ; 		call	WAIT
+                                 ; 		ret
+                                 
+                                 ; SCP:
+                                 ; 		cbi		DDRC, SCL
+                                 ; 		call	WAIT
+                                 ; 		sbi		DDRC, SCL
+                                 ; 		call	WAIT
+                                 ; 		ret
+                                 
+                                 UART_SEND:							; r16 som indata fï¿½r det som ska skickas
+000102 9110 00c0                 		lds		r17,UCSR0A			; load UCSR0A into r17
+000104 ff15                      		sbrs	r17,UDRE0			; wait for empty transmit buffer
+000105 cffc                      		rjmp	UART_SEND			; repeat loop
+                                 
+000106 2f30                      		mov		r19, r16
+000107 e340                      		ldi		r20, $30
+000108 0f34                      		add		r19, r20
+000109 9330 00c6                 		sts		UDR0,r19			; transmit character
+                                 
+00010b 9508                      		ret
+                                 
+                                 ;::	Vï¿½nterutiner ::
+                                 
+                                 WAIT:
+00010c 930f                      		push	r16
+00010d e304                      		ldi		r16, $34
                                  W1:
-00000b 9601                      		adiw	r24, 1
-00000c f7f1                      		brne	W1
-00000d 918f                      		pop		r24
-00000e 919f                      		pop		r25
+00010e 950a                      		dec		r16
+00010f f7f1                      		brne	W1
+000110 910f                      		pop		r16
+000111 9508                      		ret
+                                 
+                                 	; ---------------
+                                 
+                                 DELAY_N:						; Lï¿½ngre vï¿½nteloop, styrt av N som ï¿½r definerat i bï¿½rjan under "Data".
+000112 930f                      		push	r16
+000113 e604                      		ldi		r16, N
+                                 DELAY_N1:
+000114 940e 011a                 		call	DELAY
+000116 950a                      		dec 	r16
+000117 f7e1                      		brne	DELAY_N1
+000118 910f                      		pop		r16
+000119 9508                      		ret
+                                 
+                                 	; ---------------
+                                 
+                                 DELAY:						
+                                 								; Vï¿½nte-loop, upp till ~16 ms ($FFFF, hï¿½r 10 ms
+00011a 939f                      		push	r25
+00011b 938f                      		push	r24
+00011c e693                      		ldi 	r25, $63		; $63C4 ger 160000 cykler fï¿½r hela rutinen, i princip exakt 10.0 ms
+00011d ec84                      		ldi 	r24, $C4	
+                                 D1:
+00011e 9601                      		adiw	r24, 1
+00011f f7f1                      		brne	D1
+000120 918f                      		pop		r24
+000121 919f                      		pop		r25
+000122 9508                      		ret
+                                 
+                                 
+                                 INIT_TWI:
+000123 e408                      		ldi		r16, TWBR_PRESCALE
+000124 9300 00b8                 		sts		TWBR, r16
+000126 9100 00b9                 		lds		r16, TWSR
+000128 7f0c                      		andi	r16, $FC
+000129 9300 00b9                 		sts		TWSR, r16
+00012b 9508                      		ret
+                                 
+                                 INIT_USART:
+00012c e607                      		ldi		r16,LOW(bps)		; load baud prescale
+00012d e010                      		ldi		r17,HIGH(bps)
+                                 	
+00012e 9300 00c4                 		sts		UBRR0L,r16			; load baud prescale
+000130 9310 00c5                 		sts		UBRR0H,r17			; to UBRR0
+                                 
+000132 e108                      		ldi		r16, (1<<RXEN0)|(1<<TXEN0)		; enable transmitter "(1<<RXEN0)|" fï¿½r receiver ocksï¿½
+000133 9300 00c1                 		sts		UCSR0B,r16			; and receiver
+                                 
 
 
 RESOURCE USE INFORMATION
@@ -1060,39 +1538,39 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega328P" register use summary:
-x  :   0 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
+x  :   0 y  :   0 z  :   2 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:   4 r17:   0 r18:   0 r19:   0 r20:   0 
+r13:   0 r14:   0 r15:   0 r16:  44 r17:  19 r18:  27 r19:   3 r20:   2 
 r21:   0 r22:   0 r23:   0 r24:   4 r25:   3 r26:   0 r27:   0 r28:   0 
-r29:   0 r30:   0 r31:   0 
-Registers used: 3 out of 35 (8.6%)
+r29:   0 r30:   5 r31:   4 
+Registers used: 10 out of 35 (28.6%)
 
 "ATmega328P" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   1 and   :   0 
-andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
+.lds  :   0 .sts  :   0 adc   :   0 add   :   2 adiw  :   1 and   :   0 
+andi  :   3 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :  10 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
-brne  :   1 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :   1 cbi   :   0 cbr   :   0 
+brne  :   4 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :  58 cbi   :   0 cbr   :   0 
 clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 
-clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
-cpi   :   0 cpse  :   0 dec   :   0 eor   :   0 fmul  :   0 fmuls :   0 
-fmulsu:   0 icall :   0 ijmp  :   0 in    :   0 inc   :   0 jmp   :   0 
-ld    :   0 ldd   :   0 ldi   :   4 lds   :   0 lpm   :   0 lsl   :   0 
-lsr   :   0 mov   :   0 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   2 pop   :   2 
-push  :   2 rcall :   0 ret   :   1 reti  :   0 rjmp  :   1 rol   :   0 
-ror   :   0 sbc   :   0 sbci  :   0 sbi   :   0 sbic  :   0 sbis  :   0 
-sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
+clt   :   0 clv   :   0 clz   :   1 com   :   0 cp    :   0 cpc   :   0 
+cpi   :   7 cpse  :   0 dec   :   3 eor   :   0 fmul  :   0 fmuls :   0 
+fmulsu:   0 icall :   0 ijmp  :   0 in    :   0 inc   :   1 jmp   :   2 
+ld    :   0 ldd   :   0 ldi   :  37 lds   :   4 lpm   :   3 lsl   :   2 
+lsr   :   0 mov   :   3 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
+neg   :   0 nop   :   0 or    :   0 ori   :   1 out   :   2 pop   :  12 
+push  :  12 rcall :   0 ret   :  30 reti  :   0 rjmp  :  11 rol   :   0 
+ror   :   0 sbc   :   0 sbci  :   0 sbi   :   0 sbic  :   0 sbis  :   2 
+sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   3 sec   :   0 seh   :   0 
 sei   :   0 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
-sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :   0 
+sez   :   3 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :  11 
 sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 9 out of 113 (8.0%)
+Instructions used: 26 out of 113 (23.0%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000020     32      0     32   32768   0.1%
+[.cseg] 0x000000 0x00026c    604     16    620   32768   1.9%
 [.dseg] 0x000100 0x000100      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 

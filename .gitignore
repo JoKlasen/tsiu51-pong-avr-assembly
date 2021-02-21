@@ -1,0 +1,24 @@
+### LaTeX ###
+*.aux
+*.log
+*.synctex.gz
+
+
+### AtmelStudio ###
+### Ignore Atmel Studio temporary files and build results
+
+#Build Directories
+[Dd]ebug/
+[Rr]elease/
+
+#Build Results
+*.o
+*.d
+*.eep
+*.elf
+*.hex
+*.map
+*.srec
+
+#User Specific Files
+*.atsuo

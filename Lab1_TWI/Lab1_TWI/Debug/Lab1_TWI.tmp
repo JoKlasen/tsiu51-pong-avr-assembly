@@ -22,9 +22,52 @@
   <FILE>Lab1_TWI.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <START><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>27</LINE></START>
-  <MAIN><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>40</LINE></MAIN>
-  <WAIT><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>49</LINE></WAIT>
-  <W1><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>55</LINE></W1>
+  <COLD><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>69</LINE></COLD>
+  <TAB_7SEG><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>61</LINE></TAB_7SEG>
+  <INIT_TWI><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>513</LINE></INIT_TWI>
+  <KEY_TEST2><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>142</LINE></KEY_TEST2>
+  <RIGHT8_COUNTER><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>85</LINE></RIGHT8_COUNTER>
+  <RCOUNTER_LOOP><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>87</LINE></RCOUNTER_LOOP>
+  <RIGHT8_WRITE><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>242</LINE></RIGHT8_WRITE>
+  <DELAY_N><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>487</LINE></DELAY_N>
+  <TWI_SEND_TEST><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>97</LINE></TWI_SEND_TEST>
+  <TEST_LOOP><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>101</LINE></TEST_LOOP>
+  <TWI_SEND><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>269</LINE></TWI_SEND>
+  <TWI_SEND_TEST2><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>111</LINE></TWI_SEND_TEST2>
+  <HARD_TEST><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>119</LINE></HARD_TEST>
+  <ROTLED_RED><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>218</LINE></ROTLED_RED>
+  <ROTLED_OFF><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>236</LINE></ROTLED_OFF>
+  <READ_TEST><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>126</LINE></READ_TEST>
+  <TWI_READ><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>280</LINE></TWI_READ>
+  <KEY_TEST><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>133</LINE></KEY_TEST>
+  <L1Q><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>193</LINE></L1Q>
+  <NO_KEY><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>138</LINE></NO_KEY>
+  <ROTLED_BOTH><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>230</LINE></ROTLED_BOTH>
+  <KEY_PRESSED><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>161</LINE></KEY_PRESSED>
+  <L2Q><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>198</LINE></L2Q>
+  <R1Q><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>175</LINE></R1Q>
+  <R2Q><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>183</LINE></R2Q>
+  <JOY_LQ><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>208</LINE></JOY_LQ>
+  <JOY_RQ><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>203</LINE></JOY_RQ>
+  <RQ><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>169</LINE></RQ>
+  <LQ><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>188</LINE></LQ>
+  <SWITCHES><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>213</LINE></SWITCHES>
+  <ROTLED_GREEN><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>224</LINE></ROTLED_GREEN>
+  <LOOKUP_7SEG><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>256</LINE></LOOKUP_7SEG>
+  <LEFT8_WRITE><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>249</LINE></LEFT8_WRITE>
+  <START><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>292</LINE></START>
+  <TWI_WAIT><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>313</LINE></TWI_WAIT>
+  <SEND_ADDR><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>306</LINE></SEND_ADDR>
+  <WRITE_BYTE><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>322</LINE></WRITE_BYTE>
+  <STOP><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>299</LINE></STOP>
+  <READ_BYTE><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>330</LINE></READ_BYTE>
+  <TWI_WAIT_LOOP><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>315</LINE></TWI_WAIT_LOOP>
+  <UART_SEND><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>462</LINE></UART_SEND>
+  <WAIT><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>476</LINE></WAIT>
+  <W1><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>479</LINE></W1>
+  <DELAY_N1><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>490</LINE></DELAY_N1>
+  <DELAY><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>499</LINE></DELAY>
+  <D1><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>505</LINE></D1>
+  <INIT_USART><FILE>C:\Users\johan\Documents\TSIU51\DAvid\Lab1_TWI\Lab1_TWI\main.asm</FILE><LINE>521</LINE></INIT_USART>
  </LABELS>
 </ASSEMBLER_INFO>
