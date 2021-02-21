@@ -1,4 +1,36 @@
 Author: johkl473 <johkl473@student.liu.se>
+Date:   Sun Feb 21 21:15:57 2021 +0100
+
+    La till memory.asm för ordning av SRAM, ändrade om rutiner för knappar och LEDs så att dom togglar bits och inte är beroende av maskar som kan krocka, tända/släkta LEDs lagras i minne
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Sun Feb 21 16:38:28 2021 +0100
+
+    Använd dessa för att automagiskt generera loggbok och en att-göra lista
+
+Merge: 1c16ec4 900fb54
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Sun Feb 21 16:18:32 2021 +0100
+
+    Merge branch 'master' of gitlab.liu.se:TSIU51_VT2021/grupp28/david
+    Merge pga att jag gjort ändringar via GUI:t på gitlab utan att synkat lokalt mellan
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Sun Feb 21 16:17:30 2021 +0100
+
+    Omstrukturering av projektet. Har delat upp i en main.asm som är tänkt att innehålla huvud- och testprogram samt diverse .asm filer som sköter rutiner för separata moduler på kortet.
+
+Author: Johan Klasén <johkl473@student.liu.se>
+Date:   Fri Feb 19 13:04:41 2021 +0100
+
+    Delete Kravspec_utkast.md
+
+Author: Johan Klasén <johkl473@student.liu.se>
+Date:   Fri Feb 19 11:19:08 2021 +0100
+
+    Delete todo_list.md
+
+Author: johkl473 <johkl473@student.liu.se>
 Date:   Fri Feb 19 11:14:37 2021 +0100
 
     vidare test av att-göra

@@ -1,4 +1,4 @@
-Filen updaterad 21/02/2021 16:36:28
+Filen updaterad 21/02/2021 21:16:22
 
 7seg.asm: 
 
@@ -20,12 +20,15 @@ main.asm:
        
        
  
+memory.asm: 
+
 port_definitions.asm: 
 
 switches.asm: 
 
  TODO:
-       * Skriv eventuellt alternativ rutin för att kolla samtliga knappar
+		* Gör rutiner för joysticksen.
+       * Skriv eventuellt alternativ rutin för att kolla samtliga knappar, eller avkoda SWITCHES.
 
  
 twi.asm: 
