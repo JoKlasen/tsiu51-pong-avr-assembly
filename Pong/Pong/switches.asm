@@ -19,7 +19,8 @@
 ;::::::::::::::::
 ;
 ; TODO:
-;       * Skriv eventuellt alternativ rutin för att kolla samtliga knappar
+;		* Gör rutiner för joysticksen.
+;       * Skriv eventuellt alternativ rutin för att kolla samtliga knappar, eller avkoda SWITCHES.
 ;
 ; ENDTODO
 ;::::::::::::::::
@@ -46,9 +47,18 @@ R1Q:
 		sez
 		ret
 
+/*
 R2Q:
 		call	SWITCHES
 		cpi		r16, $FD		; Den h�r sortens maskning funkar enbart om man trycker en knapp i taget, trycker man ner tv� eller fler knappar kommer ingen att registreras. Alt med andi eller sbrs/sbrc
+		ret
+		*/
+
+R2Q:
+		call	SWITCHES
+		clz		
+		sbrs	r16, SW_R2
+		sez
 		ret
 
 LQ:
@@ -58,22 +68,30 @@ LQ:
 
 L1Q:
 		call	SWITCHES
-		cpi		r16, $FB
+		clz		
+		sbrs	r16, SW_L1
+		sez
 		ret
 
 L2Q:
 		call	SWITCHES
-		cpi		r16, $F7
+		clz		
+		sbrs	r16, SW_L2
+		sez
 		ret
 
 JOY_RQ:
 		call	SWITCHES
-		cpi		r16, $EF
+		clz		
+		sbrs	r16, JOY_R_SEL
+		sez
 		ret
 
 JOY_LQ:
 		call	SWITCHES
-		cpi		r16, $DF
+		clz		
+		sbrs	r16, JOY_L_SEL
+		sez
 		ret
 
     ; ---------------

@@ -29,6 +29,7 @@
 
 		jmp		COLD
 
+		.INCLUDE "memory.asm"
         .INCLUDE "twi.asm" 
         .INCLUDE "switches.asm"
         .INCLUDE "7seg.asm"
@@ -93,11 +94,21 @@ TWI_SEND_TEST2:
 
 
 HARD_TEST:
+		lds		r16, LED_STATUS
+		ldi		r16, $03
+		sts		LED_STATUS, r16
+HARD_TEST_LOOP:
 		call	DELAY_N
 		call	ROTLED_RED
 		call	DELAY_N
 		call	ROTLED_OFF
-		rjmp	HARD_TEST
+		call	ROTLED_GREEN
+		call	DELAY_N
+		call	ROTLED_OFF
+		call	ROTLED_BOTH
+		call	DELAY_N
+		call	ROTLED_OFF
+		rjmp	HARD_TEST_LOOP
 
 READ_TEST:
 		ldi		r17, ADDR_SWITCH
