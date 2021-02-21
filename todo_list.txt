@@ -1,10 +1,23 @@
-Filen updaterad 19/02/2021 11:12:43
+Filen updaterad 21/02/2021 16:36:28
 
 7seg.asm: 
 
  TODO:
        * Argument för att styra till punkten
-       * Gör en rutin för att skriva ut hel byte till båda displayerna (bra för felsökning?)
+       * Gör en rutin för att skriva ut hel byte(i hex) till båda displayerna (bra för felsökning?)
+       
+ 
+led.asm: 
+
+ TODO:
+       * Övriga LEDs förutom rotary encoderns LEDs
+
+ 
+main.asm: 
+
+ TODO:
+       * Massor
+       
        
  
 port_definitions.asm: 

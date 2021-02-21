@@ -1,0 +1,74 @@
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Fri Feb 19 11:14:37 2021 +0100
+
+    vidare test av att-göra
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Fri Feb 19 11:11:44 2021 +0100
+
+    test av att-göra-lista
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Fri Feb 12 14:12:25 2021 +0100
+
+    Hårdvarustödd TWI-SEND/READ
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Tue Feb 2 22:38:23 2021 +0100
+
+    Lade till lite adress- och port-definitioner, fixade RIGHT8_WRITE och la till LEFT8_WRITE, samt började kolla på problem med knapp queries och la till ändringsförslag med kommentarer på en
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Tue Feb 2 16:22:47 2021 +0100
+
+    TWI_READ och knapphantering
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Tue Feb 2 13:16:20 2021 +0100
+
+    TWI_SEND och 7-seg räknare
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Fri Jan 29 08:57:45 2021 +0100
+
+    Små ändringar till kravspec efter diskussion med Michael, godkänd version
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Thu Jan 28 16:48:16 2021 +0100
+
+    La till tex/pdf-variant av kravspec
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Thu Jan 28 11:24:24 2021 +0100
+
+    La till vänterutiner, look-uptabell för 7-Seg och två hårdkodade TWI_SEND för testning
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Tue Jan 26 14:29:10 2021 +0100
+
+    Skrev in given kod från handledning
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Tue Jan 26 13:31:12 2021 +0100
+
+    La till utkast till projekt-kravspec.
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Mon Jan 25 13:17:26 2021 +0100
+
+    Skapade ett Atmel Studio-projekt för TWI-labben
+
+Author: Johan Klasén <johkl473@student.liu.se>
+Date:   Wed Jan 20 15:30:48 2021 +0100
+
+    Update README.md
+
+Author: Johan Klasén <johkl473@student.liu.se>
+Date:   Wed Jan 20 15:18:38 2021 +0100
+
+    Update README.md
+
+Author: Johan Klasén <johkl473@student.liu.se>
+Date:   Wed Jan 20 15:15:10 2021 +0100
+
+    Initial commit
