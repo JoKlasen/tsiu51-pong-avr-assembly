@@ -1,4 +1,9 @@
 Author: johkl473 <johkl473@student.liu.se>
+Date:   Sun Feb 21 21:17:56 2021 +0100
+
+    Updaterade logg/att-göra
+
+Author: johkl473 <johkl473@student.liu.se>
 Date:   Sun Feb 21 21:15:57 2021 +0100
 
     La till memory.asm för ordning av SRAM, ändrade om rutiner för knappar och LEDs så att dom togglar bits och inte är beroende av maskar som kan krocka, tända/släkta LEDs lagras i minne

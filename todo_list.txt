@@ -1,10 +1,20 @@
-Filen updaterad 21/02/2021 21:16:22
+Filen updaterad 26/02/2021 17:07:07
 
 7seg.asm: 
 
  TODO:
        * Argument för att styra till punkten
        * Gör en rutin för att skriva ut hel byte(i hex) till båda displayerna (bra för felsökning?)
+       
+ 
+lcd.asm: 
+
+ TODO:
+       * Gör om rutinerna för att funka med TWI (KLAR)
+       * Stöd för att skriva till båda raderna
+		* Ändra så att LCD_FLASH_PRINT skriver från ett valbart meddelande i flash, skickat som argument
+		* (Ev. samma för LINE, eller bygg på med bättre rutiner för att skriva saker dit.)
+		* Integrera knappstyrning?
        
  
 led.asm: 
@@ -27,7 +37,8 @@ port_definitions.asm:
 switches.asm: 
 
  TODO:
-		* Gör rutiner för joysticksen.
+		* Gör rutiner för joysticksen. (DELVIS KLAR)
+		* Avkoda AD-signaler från dom båda joysticksens två axlar på ett bättre sätt (förslag: 1byte - 2bits/axel för båda joysticksen genom tabell-intervall)
        * Skriv eventuellt alternativ rutin för att kolla samtliga knappar, eller avkoda SWITCHES.
 
  

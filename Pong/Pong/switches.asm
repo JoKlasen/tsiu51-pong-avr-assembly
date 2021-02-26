@@ -19,7 +19,8 @@
 ;::::::::::::::::
 ;
 ; TODO:
-;		* Gör rutiner för joysticksen.
+;		* Gör rutiner för joysticksen. (DELVIS KLAR)
+;		* Avkoda AD-signaler från dom båda joysticksens två axlar på ett bättre sätt (förslag: 1byte - 2bits/axel för båda joysticksen genom tabell-intervall)
 ;       * Skriv eventuellt alternativ rutin för att kolla samtliga knappar, eller avkoda SWITCHES.
 ;
 ; ENDTODO
@@ -101,7 +102,56 @@ SWITCHES:
 		call	TWI_READ
 		ret
 
+
+;::::::::::::::::
+;	Joystick
+;::::::::::::::::
+
+READ_JOY_R_H:
+		ldi		r16, (1<<REFS0)|(1<<ADLAR)|JOY_R_H		; Väljer kanal för AD-omvandlaren, med 5v referens-spänning och left adjust (8 bitar)
+		sts		ADMUX, r16
+		call	ADC_READ8
+		ret
+
+READ_JOY_R_V:
+		ldi		r16, (1<<REFS0)|(1<<ADLAR)|JOY_R_V		; Väljer kanal för AD-omvandlaren, med 5v referens-spänning och left adjust (8 bitar)
+		sts		ADMUX, r16
+		call	ADC_READ8
+		ret
+
+READ_JOY_L_H:
+		ldi		r16, (1<<REFS0)|(1<<ADLAR)|JOY_L_H		; Väljer kanal för AD-omvandlaren, med 5v referens-spänning och left adjust (8 bitar)
+		sts		ADMUX, r16
+		call	ADC_READ8
+		ret
+
+READ_JOY_L_V:
+		ldi		r16, (1<<REFS0)|(1<<ADLAR)|JOY_L_V		; Väljer kanal för AD-omvandlaren, med 5v referens-spänning och left adjust (8 bitar)
+		sts		ADMUX, r16
+		call	ADC_READ8
+		ret
+
+    ; ---------------
+
+ADC_READ8:								; Returnerar ett värde mellan 0-255 från vald ADC-kanal till r16
+		ldi		r16, (1<<REFS0)|(1<<ADLAR)|PC0
+		sts		ADMUX, r16
+		ldi		r16, (1<<ADEN)|7		; Sätt AD-enable och prescaler till 128 (=> 125 kHz)
+		sts		ADCSRA, r16
+
+ADC_CONVERT:							; Starta omvandling
+		lds		r16, ADCSRA
+		ori		r16, (1<<ADSC)
+		sts		ADCSRA, r16
+ADC_BUSY:								; Vänta tills omvandling är klar
+		lds		r16, ADCSRA
+		sbrc	r16, ADSC
+		jmp		ADC_BUSY
+		lds		r16, ADCH
+		ret
+
 	; ---------------
+
 
 #endif /* _SWITCH_ */
 ;::::::::::::::::

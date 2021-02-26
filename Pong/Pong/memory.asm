@@ -35,6 +35,11 @@ RIGHT8_VAL:
 LEFT8_VAL:
 		.byte	1
 
+
+LCD_PORT:
+		.byte	1
+LINE:
+		.byte	17
 LCD_LINE1:
 	    .byte	17
 LCD_LINE2:

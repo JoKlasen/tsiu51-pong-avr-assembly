@@ -34,6 +34,7 @@
         .INCLUDE "switches.asm"
         .INCLUDE "7seg.asm"
         .INCLUDE "led.asm"
+		.INCLUDE "lcd.asm"
 
         .equ	N		= $64
 
@@ -51,13 +52,30 @@ COLD:
 		out 	SPL, r16
 
 		call	INIT_TWI
+		call	LINE_INIT
+		call	LCD_INIT
 		;call	INIT_USART
 
-		jmp		KEY_TEST2
+
+		jmp		JOY_TEST
 
 ;::::::::::::::::
 ;	Huvudprogram
 ;::::::::::::::::
+
+
+
+JOY_TEST:
+		call	READ_JOY_R_H
+		call	LCD_PRINT_HEX
+		rjmp	JOY_TEST
+
+
+LCD_BACKLIGHT_TEST:
+		call 	LCD_FLASH_PRINT
+		call	DELAY_N
+		call	DELAY_N
+		
 
 RIGHT8_COUNTER:
 		ldi		r18, $00

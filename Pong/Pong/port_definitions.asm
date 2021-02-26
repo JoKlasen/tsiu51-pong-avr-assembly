@@ -29,19 +29,43 @@
 		.equ	ADDR_RIGHT8	= $25		; IC3
 		.equ	ADDR_ROTLED	= $26		; IC4
 		.equ	ADDR_SWITCH	= $27		; IC5			
-		.equ	SLA_W		= (ADDR_RIGHT8 << 1) | 0	; $4A 0b01001010
+		;.equ	SLA_W		= (ADDR_RIGHT8 << 1) | 0	; $4A 0b01001010
 		;.equ	SLA_R		= (ADDR_RIGHT8 << 1) | 1	; $4B 0b01001011
 
 ;::::::::::::::::
 ;	Arduino pins
 ;::::::::::::::::
 
+		.equ	IR_RX		= PB0	
+		.equ	SPEAKER		= PB1		; Piezo-högtalaren (även IR-TX)
 
-		.equ	SCL			= PC5       ; TWI
+		.equ	MATRIX_LATCH= PB2		; SPI CS
+		.equ	MOSI		= PB3		; SPI
+		.equ	MISO		= PB4		; SPI	(Även RGB-remsan)
+		.equ	SPI_CLK		= PB5		; SPI
+
+
+		.equ	JOY_R_H		= PC0		; Höger joystick x-led
+		.equ	JOY_R_V		= PC1		; Höger joystick y-led
+		.equ	JOY_L_H		= PC2		; Vänster joystick x-led
+		.equ	JOY_L_V		= PC3		; Vänster joystick y-led
+
 		.equ	SDA			= PC4       ; TWI
+		.equ	SCL			= PC5       ; TWI
+		
 
 		.equ	SW_R		= PD0       ; Tryckknapp R
 		.equ	SW_L		= PD1       ; Tryckknapp L
+
+		.equ	RTC_CLK		= PD2		; Realtidsklocka
+
+		.equ	SW_ROT		= PD3		; Tryckknapp vred
+
+		.equ	D_LED_R		= PD4		; LED på kortet, skiljt från LED_R ovan knapp R (IC4)
+		.equ	D_LED_L		= PD5		; Se ovan
+
+		.equ	ROT_B		= PD6		; Rotary B
+		.equ	ROT_A		= PD7		; Rotary A, undersök vilken av dessa som är höger/vänster
 
 ;::::::::::::::::
 ;	I/O-expanders bit-definitioner
