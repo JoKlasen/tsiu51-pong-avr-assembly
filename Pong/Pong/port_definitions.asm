@@ -39,7 +39,7 @@
 		.equ	IR_RX		= PB0	
 		.equ	SPEAKER		= PB1		; Piezo-högtalaren (även IR-TX)
 
-		.equ	MATRIX_LATCH= PB2		; SPI CS
+		.equ	MATRIX_LATCH= PB2		; SPI SS
 		.equ	MOSI		= PB3		; SPI
 		.equ	MISO		= PB4		; SPI	(Även RGB-remsan)
 		.equ	SPI_CLK		= PB5		; SPI

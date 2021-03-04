@@ -48,7 +48,46 @@ CURSOR:
         .byte	1						; Cursor-position
 		
         
+DAMATRIX_MEM: ; Vidominnet
+										; En rad är Matris 1s GBR följt av matris 2s GBR
+DA_ROW1:
+		.byte	6
+DA_ROW2:
+		.byte	6
+DA_ROW3:
+		.byte	6
+DA_ROW4:
+		.byte	6
+DA_ROW5:
+		.byte	6
+DA_ROW6:
+		.byte	6
+DA_ROW7:
+		.byte	6
+DA_ROW8:
+		.byte	6
+
         
+GAMEBOARD: 
+
+GB_ROW1:
+		.byte 	16
+GB_ROW2:
+		.byte 	16
+GB_ROW3:
+		.byte 	16
+GB_ROW4:
+		.byte 	16
+GB_ROW5:
+		.byte 	16
+GB_ROW6:
+		.byte 	16
+GB_ROW7:
+		.byte 	16
+GB_ROW8:
+		.byte 	16
+
+
         .cseg
 
 

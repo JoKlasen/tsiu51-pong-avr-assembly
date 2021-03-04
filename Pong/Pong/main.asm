@@ -27,7 +27,12 @@
 
         .INCLUDE "port_definitions.asm"
 
+		.org	$0000
 		jmp		COLD
+		.org	OC1Aaddr
+		jmp		TIME_INTR
+
+		.org	INT_VECTORS_SIZE
 
 		.INCLUDE "memory.asm"
         .INCLUDE "twi.asm" 
@@ -35,6 +40,7 @@
         .INCLUDE "7seg.asm"
         .INCLUDE "led.asm"
 		.INCLUDE "lcd.asm"
+		.INCLUDE "DAmatrix.asm"
 
         .equ	N		= $64
 
@@ -51,18 +57,38 @@ COLD:
 		ldi 	r16, LOW(RAMEND)
 		out 	SPL, r16
 
+		;call	SPI_MasterInit
+		;call	DA_MEM_INIT
+		;call	DA_PRINT_MEM
+
 		call	INIT_TWI
-		call	LINE_INIT
-		call	LCD_INIT
+		;call	LINE_INIT
+		;call	LCD_INIT
+		call	SPI_MasterInit
+		call	DA_MEM_INIT
+		;call	DA_PRINT_MEM
 		;call	INIT_USART
+		call	DA_MEM_FLASH
 
 
-		jmp		JOY_TEST
+		jmp		DA_TEST
 
 ;::::::::::::::::
 ;	Huvudprogram
 ;::::::::::::::::
 
+GAMEBOARD_TEST:
+		call	DA_MEM_INIT
+		call	GAMEBOARD_FROM_FLASH
+		call	LOAD_DA_MEM
+GB_LOOP:
+		call	DA_PRINT_MEM
+		rjmp	GB_LOOP
+
+DA_TEST:
+		
+		call 	DA_PRINT_MEM
+		rjmp 	DA_TEST
 
 
 JOY_TEST:
