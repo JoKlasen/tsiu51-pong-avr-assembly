@@ -30,7 +30,7 @@
 		.org	$0000
 		jmp		COLD
 		.org	OC1Aaddr
-		jmp		TIME_INTR
+		jmp		TIMER1_INT
 
 		.org	INT_VECTORS_SIZE
 
@@ -41,6 +41,7 @@
         .INCLUDE "led.asm"
 		.INCLUDE "lcd.asm"
 		.INCLUDE "DAmatrix.asm"
+		.INCLUDE "gameengine.asm"
 
         .equ	N		= $64
 
@@ -62,20 +63,27 @@ COLD:
 		;call	DA_PRINT_MEM
 
 		call	INIT_TWI
-		;call	LINE_INIT
-		;call	LCD_INIT
+		call	LINE_INIT
+		call	LCD_INIT
 		call	SPI_MasterInit
+		call	TIMER1_INIT
 		call	DA_MEM_INIT
 		;call	DA_PRINT_MEM
 		;call	INIT_USART
-		call	DA_MEM_FLASH
+		;call	DA_MEM_FLASH
+		call 	INIT_PADDLES
+		
+		sei
 
-
-		jmp		DA_TEST
+		jmp		PONG_TEST
 
 ;::::::::::::::::
 ;	Huvudprogram
 ;::::::::::::::::
+
+PONG_TEST:
+		jmp		PONG
+		
 
 GAMEBOARD_TEST:
 		call	DA_MEM_INIT
@@ -92,7 +100,7 @@ DA_TEST:
 
 
 JOY_TEST:
-		call	READ_JOY_R_H
+		call	READ_JOY_L_V
 		call	LCD_PRINT_HEX
 		rjmp	JOY_TEST
 

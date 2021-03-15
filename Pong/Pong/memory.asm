@@ -87,6 +87,17 @@ GB_ROW7:
 GB_ROW8:
 		.byte 	16
 
+		
+COMPONENT_TABLE:
+	PADDLE1:
+		;x,y
+		.byte 2
+	PADDLE2:
+		;x,y
+		.byte 2	
+	BALL:
+		;x,y,riktning
+		.byte 3
 
         .cseg
 

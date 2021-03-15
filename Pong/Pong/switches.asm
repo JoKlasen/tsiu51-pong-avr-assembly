@@ -16,6 +16,9 @@
 ;
 ;::::::::::::::::
 
+; 0b RY+ RY- RX+ RX- LY+ LY- LX+ LX-
+; 0b 0 0
+
 ;::::::::::::::::
 ;
 ; TODO:
@@ -28,6 +31,13 @@
 
 #ifndef _SWITCH_
 #define _SWITCH_
+
+
+	; "Neutralvärde för joystick axlar"
+		.equ	VAL_JOY_R_H		= $83		; Höger joystick x-led
+		.equ	VAL_JOY_R_V		= $7E		; Höger joystick y-led
+		.equ	VAL_JOY_L_H		= $80		; Vänster joystick x-led
+		.equ	VAL_JOY_L_V		= $7F		; Vänster joystick y-led
 
 
 ;::::::::::::::::
@@ -107,6 +117,9 @@ SWITCHES:
 ;	Joystick
 ;::::::::::::::::
 
+
+
+
 READ_JOY_R_H:
 		ldi		r16, (1<<REFS0)|(1<<ADLAR)|JOY_R_H		; Väljer kanal för AD-omvandlaren, med 5v referens-spänning och left adjust (8 bitar)
 		sts		ADMUX, r16
@@ -134,8 +147,8 @@ READ_JOY_L_V:
     ; ---------------
 
 ADC_READ8:								; Returnerar ett värde mellan 0-255 från vald ADC-kanal till r16
-		ldi		r16, (1<<REFS0)|(1<<ADLAR)|PC0
-		sts		ADMUX, r16
+		;ldi		r16, (1<<REFS0)|(1<<ADLAR)|PC0
+		;sts		ADMUX, r16
 		ldi		r16, (1<<ADEN)|7		; Sätt AD-enable och prescaler till 128 (=> 125 kHz)
 		sts		ADCSRA, r16
 

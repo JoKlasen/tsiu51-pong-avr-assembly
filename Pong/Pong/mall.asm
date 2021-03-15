@@ -20,7 +20,7 @@
 ; TODO:
 ;       *
 ;
-; ENDTODO
+; ENDTODO;
 ;::::::::::::::::
 
 #ifndef _GAME_ENGINE_

@@ -56,6 +56,7 @@ LCD_PRINT_HEX:							; r16 som indata, skriver ut ett hex-värde för en byte i 
 		call	GET_HIGH_NIBBLE
 		call	CONVERT_BIN_TO_HEX_ASCII
 		st		X+, r17					; 16-talet i hex lagrat som ascii i LINE+0
+	
 		call	GET_LOW_NIBBLE
 		call	CONVERT_BIN_TO_HEX_ASCII
 		st		X+, r17					; Entalet i hex lagrat som ascii i LINE+1
