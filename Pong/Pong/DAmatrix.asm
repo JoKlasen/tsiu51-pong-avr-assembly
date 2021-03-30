@@ -184,7 +184,7 @@ RED:
         or      r17, r20             
         rjmp    END_IF
 BLUE:
-        or      r19, r20
+        or      r18, r20
         rjmp     END_IF
 GREEN:
         or      r19, r20

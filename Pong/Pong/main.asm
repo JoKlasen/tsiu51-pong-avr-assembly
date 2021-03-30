@@ -72,7 +72,11 @@ COLD:
 		;call	INIT_USART
 		;call	DA_MEM_FLASH
 		call 	INIT_PADDLES
+		call 	INIT_BALL
 		
+		clr 	r16
+		sts 	COUNTER_UPDATE, r16
+
 		sei
 
 		jmp		PONG_TEST
