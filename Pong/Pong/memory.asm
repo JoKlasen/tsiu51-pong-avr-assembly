@@ -28,8 +28,6 @@
 		.org	SRAM_START
 
 
-COUNTER_UPDATE:
-		.byte	1
 
 LED_STATUS:
         .byte   1
@@ -104,13 +102,18 @@ COMPONENT_TABLE:
 		.byte 3
 
 PLAYER2_SCORED:
-	.byte 1
+		.byte 1
 PLAYER1_SCORED:
-	.byte 1
+		.byte 1
 P1_SCORE:
-	.byte 1
+		.byte 1
 P2_SCORE:
-	.byte 1	
+		.byte 1	
+PLAYER_WIN:
+		.byte 1
+
+COUNTER_UPDATE:
+		.byte	1
         
 		.cseg
 

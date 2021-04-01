@@ -93,8 +93,8 @@ CONV_DONE:
 	; ---------------
 
 LCD_FLASH_PRINT:
-		ldi 	ZH, HIGH(MESSAGE*2)
-		ldi 	ZL, LOW(MESSAGE*2)
+		;ldi 	ZH, HIGH(MESSAGE*2)
+		;ldi 	ZL, LOW(MESSAGE*2)
 		ldi		XH, HIGH(LINE)
 		ldi		XL, LOW(LINE)
 TRANSFER_CHAR:

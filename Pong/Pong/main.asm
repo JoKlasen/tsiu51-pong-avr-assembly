@@ -71,19 +71,25 @@ COLD:
 		;call	DA_PRINT_MEM
 		;call	INIT_USART
 		;call	DA_MEM_FLASH
-		call 	INIT_PADDLES
-		call 	INIT_BALL
 		
-		clr 	r16
-		sts 	COUNTER_UPDATE, r16
 
-		sei
-
-		jmp		PONG_TEST
+		jmp		MAIN
 
 ;::::::::::::::::
 ;	Huvudprogram
 ;::::::::::::::::
+
+MAIN:
+	; call 	"Skriv ut startmeddelande"
+	; kolla knapptryck
+	; om ingenknapp, rjmp MAIN
+
+
+	ldi 	r16, $02
+	call	DELAY_S
+	call 	GAME_INIT
+	call 	PONG
+	rjmp 	MAIN
 
 PONG_TEST:
 		jmp		PONG
@@ -222,6 +228,20 @@ W1:
 		ret
 
 	; ---------------
+
+DELAY_S:						; Vänteloop som varar i antal sekunder, angivet som argument i r16.
+		push	r17
+		mov		r17, r16
+		ldi		r16, N
+DELAY_S1:
+		call	DELAY_N
+		dec 	r17
+		brne	DELAY_S1
+		pop		r17
+		ret
+
+	; ---------------
+
 
 DELAY_N:						; L�ngre v�nteloop, styrt av N som �r definerat i b�rjan under "Data".
 		push	r16
