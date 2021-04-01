@@ -48,6 +48,9 @@ TIMER1_INIT:
 	ret
 
 TIMER1_INT:
+	push 	r19
+	push 	r18
+	push 	r17
 	push	r16
 	in		r16, SREG
 	push	r16
@@ -64,6 +67,9 @@ TIMER_DONE:
 	pop		r16
 	out		SREG, r16
 	pop		r16
+	pop 	r17
+	pop 	r18
+	pop 	r19
 	reti
 
 
@@ -191,215 +197,348 @@ INIT_PADDLES:
 ;::::::::::::::::
 
 INIT_BALL:
-	; Startposition
-	ldi 	ZH, HIGH(BALL)
-	ldi 	ZL, LOW(BALL)
-	ldi 	r16, 7
-	st  	Z+, r16
-	ldi		r16, 4
-	st 		Z+, r16 
-	ldi		r16, 1
-	st		Z, r16
-	ret
+		; Startposition
+		ldi 	ZH, HIGH(BALL)
+		ldi 	ZL, LOW(BALL)
+		ldi 	r16, 7
+		st  	Z+, r16
+		ldi		r16, 4
+		st 		Z+, r16 
+		ldi		r16, $06
+		st		Z, r16
+		ret
 
 LOAD_BALL:
-	ldi 	ZH, HIGH(BALL)
-	ldi 	ZL, LOW(BALL)
-	ldi		YH, HIGH(GAMEBOARD)
-	ldi		YL, LOW(GAMEBOARD)
-	ld		r16, Z+				; Ball X-koord
-	add		YL, r16				; Lägg till X koord som offset på gameboard-pekaradressen
-	brcc	BALL_NO_CARRY_X
-	inc 	YH
+		ldi 	ZH, HIGH(BALL)
+		ldi 	ZL, LOW(BALL)
+		ldi		YH, HIGH(GAMEBOARD)
+		ldi		YL, LOW(GAMEBOARD)
+		ld		r16, Z+				; Ball X-koord
+		add		YL, r16				; Lägg till X koord som offset på gameboard-pekaradressen
+		brcc	BALL_NO_CARRY_X
+		inc 	YH
 BALL_NO_CARRY_X:	
-	ld  	r16, Z+				; Ball Y-koord
-	ldi 	r17, 16
-	mul 	r16, r17
+		ld  	r16, Z+				; Ball Y-koord
+		ldi 	r17, 16
+		mul 	r16, r17
 
-	add		YL, R0				; Lägg till Y koord som offset på gameboard-pekaradressen
-	brcc	BALL_NO_CARRY_Y
-	inc 	YH
+		add		YL, R0				; Lägg till Y koord som offset på gameboard-pekaradressen
+		brcc	BALL_NO_CARRY_Y
+		inc 	YH
 	BALL_NO_CARRY_Y:
 
-	ldi 	r16, 'R'
-	st  	Y, r16
-	ret
+		ldi 	r16, 'R'
+		st  	Y, r16
+		ret
 
+	
 UPDATE_BALL:
-	lds 	r16, (BALL+2)
-	cpi		r16, $01
-	breq	MOVE1
-	cpi		r16, $02
-	breq	MOVE2
-	cpi		r16, $03
-	breq	MOVE3
-	cpi		r16, $04
-	breq	MOVE4
-	cpi		r16, $05
-	breq	MOVE5
-	cpi		r16, $06
-	breq	MOVE6
-	rjmp	UPDATE_END
-MOVE1:
-	call 	UPD_MOVE1
-	rjmp 	UPDATE_END
-MOVE2:	
-	call  	UPD_MOVE2
-	rjmp	UPDATE_END
-MOVE3:
-	call 	UPD_MOVE3
-	rjmp 	UPDATE_END
-MOVE4:
-	call 	UPD_MOVE4
-	rjmp 	UPDATE_END
-MOVE5:
-	call 	UPD_MOVE5
-	rjmp 	UPDATE_END
-MOVE6:
-	call 	UPD_MOVE6
-	rjmp 	UPDATE_END
-UPDATE_END:
-	ret
 
+		call	CHECK_SCORING
+		call	MOVE_BALL
+		call	CHECK_PADDLE_COLLISION
+		call	WALL_BOUNCE
+		ret
+		
+
+
+
+		; kolla om bollens X koord är 0/15
+		; 	om ja, ge poäng (break)
+
+		; kolla om bollens X koord är 1/14
+		; 	om ja, kolla om Y koord är samma som plank eller plank+1
+		; 		om ja, byt riktning
+		;		om nej, flytta
+		; 	om nej, flytta
+		; kolla om bollens Y koord är vid tak/golv
+		; 	om ja, byt riktning
+		;	om nej, flytta
+		
+CHECK_SCORING:
+		lds 	r16, (BALL)		; bollens X
+		cpi		r16, $00
+		breq	SCORE2
+		cpi 	r16, $0F
+		breq	SCORE1
+		rjmp	CHECK_SCORING_DONE
 SCORE2:
-	ldi		r16, $01
-	sts     PLAYER2_SCORED, r16	
-	ret	
+		ldi		r16, $01
+		sts     PLAYER2_SCORED, r16	
+		rjmp	CHECK_SCORING_DONE
 SCORE1:
-	ldi		r16, $01
-	sts     PLAYER1_SCORED, r16	
-	ret		
+		ldi		r16, $01
+		sts     PLAYER1_SCORED, r16	
+		rjmp	CHECK_SCORING_DONE
+CHECK_SCORING_DONE:
+		ret
 
-; MOVE1
-UPD_MOVE1:
-	lds 	r16, BALL		; Bollens X-koord
-	cpi		r16, 0
-	breq    MV1SC2			; Om bollen når vägg
-	lds		r17, (BALL+1)	; Bollens Y-koord
-	cpi 	r17, $07
-	breq	UPD_MOVE1_CHANGE_DIR	; Om bollen når tak/golv, byt riktning
-	dec 	r16						; Annars öka/minska båda koordinaterna
-	sts		BALL, r16
-	inc		r17
-	sts 	(BALL+1), r17
-	rjmp 	UPD_MOVE1_DONE
-UPD_MOVE1_CHANGE_DIR:
-	lds 	r16, (BALL+2)
-	ldi		r17, $02
-	add		r16, r17
-	sts		(BALL+2), r16
-	rjmp	UPD_MOVE1_DONE
-MV1SC2:
-	call 	SCORE2
-UPD_MOVE1_DONE:
-	ret
-
-; MOVE2
-UPD_MOVE2:
-	lds 	r16, BALL		; Bollens X-koord
-	cpi		r16, 0
-	breq    MV2SC2			; Om bollen når vänstra väggen
-	breq	UPD_MOVE2_CHANGE_DIR	;
-	dec 	r16						; Annars minska x kordinaten
-	sts		BALL, r16
-	rjmp 	UPD_MOVE2_DONE
-UPD_MOVE2_CHANGE_DIR:
-	ldi 	r16, 5
-	sts 	BALL+2, r16
-	rjmp	UPD_MOVE2_DONE
-MV2SC2:
-	call 	SCORE2	
-UPD_MOVE2_DONE:
-	ret	
-
-; MOVE3
-UPD_MOVE3:
-	lds 	r16, BALL		; Bollens X-koord
-	cpi		r16, 0
-	breq    MV3SC2			; Om bollen når vägg
-	lds		r17, (BALL+1)	; Bollens Y-koord
-	cpi 	r17, $00
-	breq	UPD_MOVE3_CHANGE_DIR	; Om bollen når tak/golv, byt riktning
-	dec 	r16						; Annars öka/minska båda koordinaterna
-	sts		BALL, r16
-	dec		r17
-	sts 	(BALL+1), r17
-	rjmp 	UPD_MOVE3_DONE
-
-UPD_MOVE3_CHANGE_DIR:
-	ldi		r16, 1
-	sts		(BALL+2), r16
-	rjmp	UPD_MOVE3_DONE
-MV3SC2:
-	call 	SCORE2
-UPD_MOVE3_DONE:
-	ret
+;Generell move
+MOVE_BALL:
+		lds 	r16, (BALL)		; bollens X
+		lds 	r17, (BALL+1)	; bollens Y
+		lds 	r18, (BALL+2)	; "riktning"
+		sbrc	r18, 0			; Xr+
+		inc 	r16
+		sbrc	r18, 1			; Xr-
+		dec 	r16
+		sbrc	r18, 2			; Yr+
+		inc 	r17
+		sbrc 	r18, 3			; Yr-
+		dec 	r17
+		sts		(BALL), r16
+		sts 	(BALL+1), r17
+		ret
 
 
-; MOVE4
-UPD_MOVE4:
-	lds 	r16, BALL		; Bollens X-koord
-	cpi		r16, 15
-	breq    MV4SC1			; Om bollen når vägg
-	lds		r17, (BALL+1)	; Bollens Y-koord
-	cpi 	r17, 7
-	breq	UPD_MOVE4_CHANGE_DIR	; Om bollen når tak/golv, byt riktning
-	inc 	r16						; Annars öka/minska båda koordinaterna
-	sts		BALL, r16
-	dec		r17
-	sts 	(BALL+1), r17
-	rjmp 	UPD_MOVE4_DONE
-
-UPD_MOVE4_CHANGE_DIR:
-	ldi		r16, 1
-	sts		(BALL+2), r16
-	rjmp	UPD_MOVE4_DONE
-MV4SC1:
-	call 	SCORE1
-UPD_MOVE4_DONE:
-	ret	
-
-; MOVE5
-UPD_MOVE5:
-	lds 	r16, BALL		; Bollens X-koord
-	cpi		r16, 15
-	breq    MV5SC1			; Om bollen når högra väggen
-	breq	UPD_MOVE5_CHANGE_DIR	;
-	inc 	r16						; Annars öka x kordinaten
-	sts		BALL, r16
-	rjmp 	UPD_MOVE5_DONE
-UPD_MOVE5_CHANGE_DIR:
-	ldi 	r16, 2
-	sts 	BALL+2, r16
-	rjmp	UPD_MOVE5_DONE
-MV5SC1:
-	call 	SCORE1	
-UPD_MOVE5_DONE:
-	ret	
+; Kolla om krock med Paddle
+CHECK_PADDLE_COLLISION:
+		lds 	r16, (BALL)		; bollens X
+		lds 	r17, (BALL+1)	; bollens Y
+		cpi 	r16, $01
+		brne	NO_POT_COLLISION_LEFT
+		lds 	r18, (PADDLE1+1)
+		cp  	r17, r18
+		breq	COLLISION
+		inc 	r18
+		cp  	r17, r18
+		breq	COLLISION
+NO_POT_COLLISION_LEFT:
+		cpi 	r16, $0E
+		brne	NO_COLLISION
+		lds 	r18, (PADDLE2+1)
+		cp  	r17, r18
+		breq	COLLISION
+		inc 	r18
+		cp  	r17, r18
+		breq	COLLISION
+		rjmp	NO_COLLISION
+COLLISION:
+		call	PADDLE_BOUNCE
+NO_COLLISION:
+		ret
 
 
-; MOVE6
-UPD_MOVE6:
-	lds 	r16, BALL		; Bollens X-koord
-	cpi		r16, 15
-	breq    MV6SC1			; Om bollen når vägg
-	lds		r17, (BALL+1)	; Bollens Y-koord
-	cpi 	r17, $00
-	breq	UPD_MOVE6_CHANGE_DIR	; Om bollen når tak/golv, byt riktning
-	dec 	r16						; Annars öka/minska båda koordinaterna
-	sts		BALL, r16
-	inc		r17
-	sts 	(BALL+1), r17
-	rjmp 	UPD_MOVE6_DONE
+; Generell studs mot paddel
+PADDLE_BOUNCE:
+		lds 	r16, (BALL)		; bollens X
+		lds		r18, (BALL+2)	; "riktning"
 
-UPD_MOVE6_CHANGE_DIR:
-	ldi		r16, 4
-	sts		(BALL+2), r16
-	rjmp	UPD_MOVE6_DONE
-MV6SC1:
-	call 	SCORE1
-UPD_MOVE6_DONE:
-	ret	
+		ldi 	r19, $01
+		cpi 	r16, $01
+		breq	PADDLE_BOUNCE_LEFT	; vänster vägg, -1 på riktning
+		cpi 	r16, $0E
+		breq	PADDLE_BOUNCE_RIGHT	; höger vägg, +1 på riktning
+		rjmp 	PADDLE_BOUNCE_DONE
+PADDLE_BOUNCE_LEFT:
+		sub 	r18, r19
+		sts 	(BALL+2), r18
+		rjmp 	PADDLE_BOUNCE_DONE
+PADDLE_BOUNCE_RIGHT:
+		add 	r18, r19
+		sts 	(BALL+2), r18
+		rjmp 	PADDLE_BOUNCE_DONE		
+PADDLE_BOUNCE_DONE:
+		ret
+
+
+; Generell studs tak/golv
+WALL_BOUNCE:
+		lds 	r17, (BALL+1)	; bollens Y
+		lds		r18, (BALL+2)	; "riktning"
+		
+		ldi 	r19, $04
+		cpi 	r17, $00
+		breq	WALL_BOUNCE_TOP	; tak, -4 på riktning
+		cpi 	r17, $07
+		breq	WALL_BOUNCE_BOT	; golv, +4 på riktning
+		rjmp 	WALL_BOUNCE_DONE
+WALL_BOUNCE_TOP:
+		sub 	r18, r19
+		sts 	(BALL+2), r18
+		rjmp 	WALL_BOUNCE_DONE
+WALL_BOUNCE_BOT:
+		add 	r18, r19
+		sts 	(BALL+2), r18
+		rjmp 	WALL_BOUNCE_DONE		
+WALL_BOUNCE_DONE:
+		ret
+
+; UPDATE_BALL:
+; 	lds 	r16, (BALL+2)
+; 	cpi		r16, $01
+; 	breq	MOVE1
+; 	cpi		r16, $02
+; 	breq	MOVE2
+; 	cpi		r16, $03
+; 	breq	MOVE3
+; 	cpi		r16, $04
+; 	breq	MOVE4
+; 	cpi		r16, $05
+; 	breq	MOVE5
+; 	cpi		r16, $06
+; 	breq	MOVE6
+; 	rjmp	UPDATE_END
+; MOVE1:
+; 	call 	UPD_MOVE1
+; 	rjmp 	UPDATE_END
+; MOVE2:	
+; 	call  	UPD_MOVE2
+; 	rjmp	UPDATE_END
+; MOVE3:
+; 	call 	UPD_MOVE3
+; 	rjmp 	UPDATE_END
+; MOVE4:
+; 	call 	UPD_MOVE4
+; 	rjmp 	UPDATE_END
+; MOVE5:
+; 	call 	UPD_MOVE5
+; 	rjmp 	UPDATE_END
+; MOVE6:
+; 	call 	UPD_MOVE6
+; 	rjmp 	UPDATE_END
+; UPDATE_END:
+; 	ret
+
+; SCORE2:
+; 	ldi		r16, $01
+; 	sts     PLAYER2_SCORED, r16	
+; 	ret	
+; SCORE1:
+; 	ldi		r16, $01
+; 	sts     PLAYER1_SCORED, r16	
+; 	ret	
+
+; ; MOVE1
+; UPD_MOVE1:
+; 	lds 	r16, BALL		; Bollens X-koord
+; 	cpi		r16, 0
+; 	breq    MV1SC2			; Om bollen når vägg
+; 	lds		r17, (BALL+1)	; Bollens Y-koord
+; 	cpi 	r17, $07
+; 	breq	UPD_MOVE1_CHANGE_DIR	; Om bollen når tak/golv, byt riktning
+; 	dec 	r16						; Annars öka/minska båda koordinaterna
+; 	sts		BALL, r16
+; 	inc		r17
+; 	sts 	(BALL+1), r17
+; 	rjmp 	UPD_MOVE1_DONE
+; UPD_MOVE1_CHANGE_DIR:
+; 	lds 	r16, (BALL+2)
+; 	ldi		r17, $02
+; 	add		r16, r17
+; 	sts		(BALL+2), r16
+; 	rjmp	UPD_MOVE1_DONE
+; MV1SC2:
+; 	call 	SCORE2
+; UPD_MOVE1_DONE:
+; 	ret
+
+; ; MOVE2
+; UPD_MOVE2:
+; 	lds 	r16, BALL		; Bollens X-koord
+; 	cpi		r16, 0
+; 	breq    MV2SC2			; Om bollen når vänstra väggen
+; 	breq	UPD_MOVE2_CHANGE_DIR	;
+; 	dec 	r16						; Annars minska x kordinaten
+; 	sts		BALL, r16
+; 	rjmp 	UPD_MOVE2_DONE
+; UPD_MOVE2_CHANGE_DIR:
+; 	ldi 	r16, 5
+; 	sts 	BALL+2, r16
+; 	rjmp	UPD_MOVE2_DONE
+; MV2SC2:
+; 	call 	SCORE2	
+; UPD_MOVE2_DONE:
+; 	ret	
+
+; ; MOVE3
+; UPD_MOVE3:
+; 	lds 	r16, BALL		; Bollens X-koord
+; 	cpi		r16, 0
+; 	breq    MV3SC2			; Om bollen når vägg
+; 	lds		r17, (BALL+1)	; Bollens Y-koord
+; 	cpi 	r17, $00
+; 	breq	UPD_MOVE3_CHANGE_DIR	; Om bollen når tak/golv, byt riktning
+; 	dec 	r16						; Annars öka/minska båda koordinaterna
+; 	sts		BALL, r16
+; 	dec		r17
+; 	sts 	(BALL+1), r17
+; 	rjmp 	UPD_MOVE3_DONE
+
+; UPD_MOVE3_CHANGE_DIR:
+; 	ldi		r16, 1
+; 	sts		(BALL+2), r16
+; 	rjmp	UPD_MOVE3_DONE
+; MV3SC2:
+; 	call 	SCORE2
+; UPD_MOVE3_DONE:
+; 	ret
+
+
+; ; MOVE4
+; UPD_MOVE4:
+; 	lds 	r16, BALL		; Bollens X-koord
+; 	cpi		r16, 15
+; 	breq    MV4SC1			; Om bollen når vägg
+; 	lds		r17, (BALL+1)	; Bollens Y-koord
+; 	cpi 	r17, 7
+; 	breq	UPD_MOVE4_CHANGE_DIR	; Om bollen når tak/golv, byt riktning
+; 	inc 	r16						; Annars öka/minska båda koordinaterna
+; 	sts		BALL, r16
+; 	dec		r17
+; 	sts 	(BALL+1), r17
+; 	rjmp 	UPD_MOVE4_DONE
+
+; UPD_MOVE4_CHANGE_DIR:
+; 	ldi		r16, 1
+; 	sts		(BALL+2), r16
+; 	rjmp	UPD_MOVE4_DONE
+; MV4SC1:
+; 	call 	SCORE1
+; UPD_MOVE4_DONE:
+; 	ret	
+
+; ; MOVE5
+; UPD_MOVE5:
+; 	lds 	r16, BALL		; Bollens X-koord
+; 	cpi		r16, 15
+; 	breq    MV5SC1			; Om bollen når högra väggen
+; 	breq	UPD_MOVE5_CHANGE_DIR	;
+; 	inc 	r16						; Annars öka x kordinaten
+; 	sts		BALL, r16
+; 	rjmp 	UPD_MOVE5_DONE
+; UPD_MOVE5_CHANGE_DIR:
+; 	ldi 	r16, 2
+; 	sts 	BALL+2, r16
+; 	rjmp	UPD_MOVE5_DONE
+; MV5SC1:
+; 	call 	SCORE1	
+; UPD_MOVE5_DONE:
+; 	ret	
+
+
+; ; MOVE6
+; UPD_MOVE6:
+; 	lds 	r16, BALL		; Bollens X-koord
+; 	cpi		r16, 15
+; 	breq    MV6SC1			; Om bollen når vägg
+; 	lds		r17, (BALL+1)	; Bollens Y-koord
+; 	cpi 	r17, $00
+; 	breq	UPD_MOVE6_CHANGE_DIR	; Om bollen når tak/golv, byt riktning
+; 	dec 	r16						; Annars öka/minska båda koordinaterna
+; 	sts		BALL, r16
+; 	inc		r17
+; 	sts 	(BALL+1), r17
+; 	rjmp 	UPD_MOVE6_DONE
+
+; UPD_MOVE6_CHANGE_DIR:
+; 	ldi		r16, 4
+; 	sts		(BALL+2), r16
+; 	rjmp	UPD_MOVE6_DONE
+; MV6SC1:
+; 	call 	SCORE1
+; UPD_MOVE6_DONE:
+; 	ret	
 
 
 ;::::::::::::::::
@@ -422,6 +561,7 @@ CLEAR_GAMEBOARD_LOOP:
 ;::::::::::::::::	
 
 PLAYER_SCORED: ; kontrollerar om spelaren och gjort mål och inc score:n
+	
 	lds		r16, PLAYER1_SCORED
 	cpi		r16, 1
 	breq	INC_P1_SCORE
@@ -435,6 +575,8 @@ INC_P1_SCORE:
 	lds     r16, P1_SCORE
 	inc		r16
 	sts		P1_SCORE, r16
+	call	LEFT8_WRITE
+	call 	INIT_BALL
 	rjmp	PLAYER_SCORED_DONE
 INC_P2_SCORE:
 	clr 	r16
@@ -442,6 +584,8 @@ INC_P2_SCORE:
 	lds     r16, P2_SCORE
 	inc		r16
 	sts		P2_SCORE, r16
+	call 	RIGHT8_WRITE
+	call 	INIT_BALL
 PLAYER_SCORED_DONE:
 	ret
 
