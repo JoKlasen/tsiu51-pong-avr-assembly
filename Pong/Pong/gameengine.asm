@@ -51,7 +51,7 @@ TIMER1_INT:
 	push	r16
 	in		r16, SREG
 	push	r16
-	;call	UPDATE_BALL
+	call	UPDATE_BALL
 	lds 	r16, COUNTER_UPDATE
 	inc 	r16
 	cpi		r16, $03
@@ -452,7 +452,6 @@ PLAYER_SCORED_DONE:
 
 
 PONG:
-	call 	UPDATE_BALL
 	call 	UPDATE
 	call 	DA_PRINT_MEM
 	call 	PLAYER_SCORED
