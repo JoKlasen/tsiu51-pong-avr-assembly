@@ -1,5 +1,5 @@
 
-A;::::::::::::::::::::::::::::::::::::::::::::
+;::::::::::::::::::::::::::::::::::::::::::::
 ;
 ; memory.asm
 ;
@@ -103,6 +103,10 @@ COMPONENT_TABLE:
 		;x,y,riktning
 		.byte 3
 
+PLAYER2_SCORED:
+	.byte 1
+PLAYER1_SCORED:
+	.byte 1
         .cseg
 
 
