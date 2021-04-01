@@ -107,7 +107,12 @@ PLAYER2_SCORED:
 	.byte 1
 PLAYER1_SCORED:
 	.byte 1
-        .cseg
+P1_SCORE:
+	.byte 1
+P2_SCORE:
+	.byte 1	
+        
+		.cseg
 
 
 #endif /* _MEM_ */

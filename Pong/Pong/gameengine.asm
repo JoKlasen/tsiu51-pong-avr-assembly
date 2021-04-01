@@ -417,10 +417,45 @@ CLEAR_GAMEBOARD_LOOP:
         brne    CLEAR_GAMEBOARD_LOOP
         ret
 
+;::::::::::::::::
+;       If scored
+;::::::::::::::::	
+
+PLAYER_SCORED: ; kontrollerar om spelaren och gjort mål och inc score:n
+	lds		r16, PLAYER1_SCORED
+	cpi		r16, 1
+	breq	INC_P1_SCORE
+	lds		r16, PLAYER2_SCORED
+	cpi		r16, 1
+	breq	INC_P2_SCORE
+	rjmp 	PLAYER_SCORED_DONE
+INC_P1_SCORE:
+	clr 	r16
+	sts		PLAYER1_SCORED, r16
+	lds     r16, P1_SCORE
+	inc		r16
+	sts		P1_SCORE, r16
+	rjmp	PLAYER_SCORED_DONE
+INC_P2_SCORE:
+	clr 	r16
+	sts		PLAYER2_SCORED, r16
+	lds     r16, P2_SCORE
+	inc		r16
+	sts		P2_SCORE, r16
+PLAYER_SCORED_DONE:
+	ret
+
+
+;::::::::::::::::
+;       GAMELOOP
+;::::::::::::::::	
+
+
 PONG:
 	call 	UPDATE_BALL
 	call 	UPDATE
 	call 	DA_PRINT_MEM
+	call 	PLAYER_SCORED
 	call	DELAY
 	call	DELAY
 	call	DELAY
