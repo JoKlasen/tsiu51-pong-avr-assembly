@@ -26,8 +26,15 @@
 #ifndef _GAME_ENGINE_
 #define _GAME_ENGINE_
 
-
-P1_WINS_MSG:					; Max 16 tecken, sträng som skrivs ut med LCD_FLASH_PRINT
+WELCOME_MSG:					; Max 16 tecken, sträng som skrivs ut med LCD_FLASH_PRINT
+		.db		"WELCOME TO PONG!", $00
+READY_MSG:
+		.db		"HIT L/R TO START", $00
+P1_POINT_MSG:
+		.db		"PLAYER 1 SCORES!", $00
+P2_POINT_MSG:
+		.db		"PLAYER 1 SCORES!", $00
+P1_WINS_MSG:
 		.db		" PLAYER 1 WINS! ", $00
 P2_WINS_MSG:					; Max 16 tecken, sträng som skrivs ut med LCD_FLASH_PRINT
 		.db		" PLAYER 2 WINS! ", $00
@@ -451,6 +458,7 @@ PONG:
 WIN:
 	cli
 	call	PRINT_WIN_MSG
+	call	FIREWORKS
 	; Spela ljud
 	ldi 	r16, $03
 	call	DELAY_S		; 3 sekunder

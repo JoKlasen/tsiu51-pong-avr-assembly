@@ -100,10 +100,10 @@ PIC_RAM: ; W = vit, R = röd, G = grön, B = blå
         .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
 
 GAMEBOARD_FROM_FLASH:
-        ldi	YH, HIGH(GAMEBOARD)
-	ldi	YL, LOW(GAMEBOARD)
-        ldi	ZH, HIGH(PIC_RAM*2)
-	ldi	ZL, LOW(PIC_RAM*2)
+        ldi		YH, HIGH(GAMEBOARD)
+		ldi		YL, LOW(GAMEBOARD)
+        ldi		ZH, HIGH(PIC_RAM*2)
+		ldi		ZL, LOW(PIC_RAM*2)
         ldi     r17, $80            ; 8 rader x 16 bytes
 GAMEBOARD_FROM_FLASH_LOOP:
         lpm     r16, Z+
@@ -113,10 +113,10 @@ GAMEBOARD_FROM_FLASH_LOOP:
         ret
 
 DA_MEM_FLASH:
-        ldi	YH, HIGH(DAMATRIX_MEM)
-	ldi	YL, LOW(DAMATRIX_MEM)
-        ldi	ZH, HIGH(PIC*2)
-	ldi	ZL, LOW(PIC*2)
+        ldi		YH, HIGH(DAMATRIX_MEM)
+		ldi		YL, LOW(DAMATRIX_MEM)
+        ldi		ZH, HIGH(PIC*2)
+		ldi		ZL, LOW(PIC*2)
         ldi     r17, $30            ; 8 rader x 6 bytes
 DA_MEM_FLASH_LOOP:
         lpm     r16, Z+
@@ -126,6 +126,42 @@ DA_MEM_FLASH_LOOP:
         dec     r17
         brne    DA_MEM_FLASH_LOOP
         ret
+
+;:::::::::::
+; Animering    
+;:::::::::::
+
+GAMEBOARD_FROM_FLASH_ZPTR:			; Tar tabell som argument i Z-pekaren
+        ldi		YH, HIGH(GAMEBOARD)
+		ldi		YL, LOW(GAMEBOARD)
+        ldi     r17, $80            ; 8 rader x 16 bytes
+GAMEBOARD_FROM_FLASH_ZPTR_LOOP:
+        lpm     r16, Z+
+        st      Y+, r16
+        dec     r17
+        brne    GAMEBOARD_FROM_FLASH_ZPTR_LOOP
+        ret
+
+FIREWORKS:
+		ldi		ZH, HIGH(FW_ANIM1*2)
+		ldi		ZL, LOW(FW_ANIM1*2)
+		call	GAMEBOARD_FROM_FLASH_ZPTR
+		call	LOAD_DA_MEM
+		call	DA_PRINT_MEM
+		call	DELAY_N
+		ldi		ZH, HIGH(FW_ANIM2*2)
+		ldi		ZL, LOW(FW_ANIM2*2)
+		call	GAMEBOARD_FROM_FLASH_ZPTR
+		call	LOAD_DA_MEM
+		call	DA_PRINT_MEM
+		call	DELAY_N
+		ldi		ZH, HIGH(FW_ANIM3*2)
+		ldi		ZL, LOW(FW_ANIM3*2)
+		call	GAMEBOARD_FROM_FLASH_ZPTR
+		call	LOAD_DA_MEM
+		call	DA_PRINT_MEM
+		call	DELAY_N
+		ret
 
 ;:::::::::::
 ; Gameboard        
