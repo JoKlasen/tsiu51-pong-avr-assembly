@@ -29,6 +29,8 @@
 
 		.org	$0000
 		jmp		COLD
+		.org 	OC2Aaddr
+		jmp 	SPEAKER_TIMER_INT
 		.org	OC1Aaddr
 		jmp		TIMER1_INT
 
@@ -42,6 +44,7 @@
 		.INCLUDE "lcd.asm"
 		.INCLUDE "DAmatrix.asm"
 		.INCLUDE "gameengine.asm"
+		.INCLUDE "speaker.asm"
 
         .equ	N		= $64
 
@@ -62,11 +65,13 @@ COLD:
 		;call	DA_MEM_INIT
 		;call	DA_PRINT_MEM
 
+
 		call	INIT_TWI
 		call	LINE_INIT
 		call	LCD_INIT
 		call	SPI_MasterInit
 		call	TIMER1_INIT
+		call	TIMER2_INIT
 		call	DA_MEM_INIT
 		call	DA_PRINT_MEM
 		;call	INIT_USART
@@ -76,8 +81,7 @@ COLD:
 		call	LCD_FLASH_PRINT
 		ldi 	r16, $02
 		call	DELAY_S
-
-
+		
 		jmp		MAIN
 
 ;::::::::::::::::
@@ -106,6 +110,24 @@ MAIN:
 PONG_TEST:
 		jmp		PONG
 		
+SPEAKER_TEST:
+		call	PLAY_NOTE_B
+		;ldi 	r16, $02
+		;call	DELAY_S
+		call	DELAY_N
+		call	PLAY_NOTE_A
+		;ldi 	r16, $02
+		;call	DELAY_S
+		call	DELAY_N
+		;call	PLAY_NOTE_G
+		;ldi 	r16, $02
+		;call	DELAY_S
+		;call	DELAY
+		;call	DELAY
+		;call	DELAY
+		;call 	STOP_SPEAKER
+		;call	DELAY_N
+		rjmp	SPEAKER_TEST
 
 GAMEBOARD_TEST:
 		call	DA_MEM_INIT

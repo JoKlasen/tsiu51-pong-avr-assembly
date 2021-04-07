@@ -45,15 +45,15 @@ P2_WINS_MSG:					; Max 16 tecken, sträng som skrivs ut med LCD_FLASH_PRINT
 ;::::::::::::::::
 
 
-.equ	SECOND_TICKS = 62500 - 1	; @ 16/256 MHz
+	.equ	TIMER1_TICKS = 31250 - 1	; @ 16/256 MHz
 
 TIMER1_INIT:
 	push	r16
 	ldi		r16, (1<<WGM12)|(1<<CS11)|(1<<CS10)	; CTC, prescale 64
 	sts		TCCR1B, r16
-	ldi		r16, HIGH(SECOND_TICKS)
+	ldi		r16, HIGH(TIMER1_TICKS)
 	sts		OCR1AH, r16
-	ldi		r16, LOW(SECOND_TICKS)
+	ldi		r16, LOW(TIMER1_TICKS)
 	sts		OCR1AL, r16
 	ldi		r16, (1<<OCIE1A)			; allow to interrupt
 	sts		TIMSK1, r16
@@ -352,6 +352,7 @@ PADDLE_BOUNCE_RIGHT:
 		sts 	(BALL+2), r18
 		rjmp 	PADDLE_BOUNCE_DONE		
 PADDLE_BOUNCE_DONE:
+		call 	PLAY_NOTE_G
 		ret
 
 
@@ -369,10 +370,12 @@ WALL_BOUNCE:
 WALL_BOUNCE_TOP:
 		sub 	r18, r19
 		sts 	(BALL+2), r18
+		call 	PLAY_NOTE_B
 		rjmp 	WALL_BOUNCE_DONE
 WALL_BOUNCE_BOT:
 		add 	r18, r19
 		sts 	(BALL+2), r18
+		call 	PLAY_NOTE_A
 		rjmp 	WALL_BOUNCE_DONE		
 WALL_BOUNCE_DONE:
 		ret

@@ -48,7 +48,15 @@ LCD_LINE2:
 	    .byte	17        
 CURSOR:	
         .byte	1						; Cursor-position
-		
+
+
+NOTE_LENGTH:
+NOTE_LENGTH_LOW:
+		.byte	1
+NOTE_LENGTH_HIGH:
+		.byte 	1
+
+
         
 DAMATRIX_MEM: ; Vidominnet
 										; En rad är Matris 1s GBR följt av matris 2s GBR
