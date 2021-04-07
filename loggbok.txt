@@ -1,4 +1,59 @@
 Author: johkl473 <johkl473@student.liu.se>
+Date:   Wed Apr 7 16:33:20 2021 +0200
+
+    Ljud!
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Fri Apr 2 11:29:41 2021 +0200
+
+    Knapptryck för att starta spelet, meddelanden och början till en animering på DA
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Thu Apr 1 19:00:15 2021 +0200
+
+    Ordnade poängräknare, vinstmeddelanden och ändrade main-loopar
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Thu Apr 1 17:37:13 2021 +0200
+
+    Fungerande boll och studs!
+
+Author: osklu130 <osklu130@student.liu.se>
+Date:   Thu Apr 1 12:46:56 2021 +0200
+
+    flyttade update_ball
+
+Author: osklu130 <osklu130@student.liu.se>
+Date:   Thu Apr 1 12:41:59 2021 +0200
+
+    lade till score funktion
+
+Author: osklu130 <osklu130@student.liu.se>
+Date:   Thu Apr 1 12:22:18 2021 +0200
+
+    lade till UPD_MOVE funktionerna
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Tue Mar 30 13:10:06 2021 +0200
+
+    Början på bollen och kollisionslogiken
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Mon Mar 15 14:39:44 2021 +0100
+
+    Början på spelmotor, dugligt fungerande paddlar
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Thu Mar 4 17:06:21 2021 +0100
+
+    Hårdvaru-rutiner för DAmatrix
+
+Author: johkl473 <johkl473@student.liu.se>
+Date:   Fri Feb 26 17:10:15 2021 +0100
+
+    Grundläggande rutiner för LCDn (med TWI) klara. Läsning av joysticks axlar fungerar, men behöver avkodas från 4x1byte mha intervall (format??)
+
+Author: johkl473 <johkl473@student.liu.se>
 Date:   Sun Feb 21 21:17:56 2021 +0100
 
     Updaterade logg/att-göra
