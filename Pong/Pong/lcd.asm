@@ -13,7 +13,8 @@
 ; Modulen för utskrifter på 2x16 LCDn på DAvid.
 ;
 ; Omgjord för överföring med TWI-protokoll.
-; Används primärt genom att lagra meddelanden i LINE i SRAM och använda LINE_PRINT, eller hårdkodat meddelande i .db MESSAGE anropat med LCD_FLASH_PRINT
+; Används primärt genom att lagra meddelanden i LINE i SRAM och använda LINE_PRINT, 
+; eller hårdkodat meddelande i .db, anropat med LCD_FLASH_PRINT och meddelandet laddat i Z-pekaren
 ;
 ;::::::::::::::::
 
@@ -22,7 +23,7 @@
 ; TODO:
 ;       * Gör om rutinerna för att funka med TWI (KLAR)
 ;       * Stöd för att skriva till båda raderna
-;		* Ändra så att LCD_FLASH_PRINT skriver från ett valbart meddelande i flash, skickat som argument
+;		* Ändra så att LCD_FLASH_PRINT skriver från ett valbart meddelande i flash, skickat som argument (KLAR)
 ;		* (Ev. samma för LINE, eller bygg på med bättre rutiner för att skriva saker dit.)
 ;		* Integrera knappstyrning?
 ;       

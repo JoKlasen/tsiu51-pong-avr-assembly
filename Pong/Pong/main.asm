@@ -55,17 +55,14 @@
 
 
 COLD:
-														; Initiera stackpekaren
+	; Initiera stackpekaren
 		ldi 	r16, HIGH(RAMEND)
 		out 	SPH, r16
 		ldi 	r16, LOW(RAMEND)
 		out 	SPL, r16
 
-		;call	SPI_MasterInit
-		;call	DA_MEM_INIT
-		;call	DA_PRINT_MEM
 
-
+	; Kör initieringar av hårdvara och minne
 		call	INIT_TWI
 		call	LINE_INIT
 		call	LCD_INIT
@@ -74,14 +71,16 @@ COLD:
 		call	TIMER2_INIT
 		call	DA_MEM_INIT
 		call	DA_PRINT_MEM
-		;call	INIT_USART
-		;call	DA_MEM_FLASH
+
+
+	; Skriv ut välkomstmeddelande
 		ldi 	ZH, HIGH(WELCOME_MSG*2)
 		ldi 	ZL, LOW(WELCOME_MSG*2)
 		call	LCD_FLASH_PRINT
 		ldi 	r16, $02
 		call	DELAY_S
 		
+				; Kör MAIN, eller välj ett testprogram från tests.asm
 		jmp		MAIN
 
 ;::::::::::::::::
@@ -89,161 +88,28 @@ COLD:
 ;::::::::::::::::
 
 MAIN:
-
+	; Skriv ut "redo"-meddelandet
 		ldi 	ZH, HIGH(READY_MSG*2)
 		ldi 	ZL, LOW(READY_MSG*2)
 		call	LCD_FLASH_PRINT
+
+	; Kolla knapptryckningar för att starta spelet
 		clz
 		call	RQ
 		;brne	MAIN	; Avkommentera denna om vi vill att båda spelarna måste trycka "redo" 
 		call	LQ
 		brne	MAIN
 
+	; Töm LCDn på "redo"-meddelandet
 		call	LINE_INIT
 		call	LINE_PRINT
-		;ldi 	r16, $02
-		;call	DELAY_S
+
+	; Starta spelet
 		call 	GAME_INIT
 		call 	PONG
 		rjmp 	MAIN
 
-PONG_TEST:
-		jmp		PONG
-		
-SPEAKER_TEST:
-		call	PLAY_NOTE_B
-		;ldi 	r16, $02
-		;call	DELAY_S
-		call	DELAY_N
-		call	PLAY_NOTE_A
-		;ldi 	r16, $02
-		;call	DELAY_S
-		call	DELAY_N
-		;call	PLAY_NOTE_G
-		;ldi 	r16, $02
-		;call	DELAY_S
-		;call	DELAY
-		;call	DELAY
-		;call	DELAY
-		;call 	STOP_SPEAKER
-		;call	DELAY_N
-		rjmp	SPEAKER_TEST
 
-GAMEBOARD_TEST:
-		call	DA_MEM_INIT
-		call	GAMEBOARD_FROM_FLASH
-		call	LOAD_DA_MEM
-GB_LOOP:
-		call	DA_PRINT_MEM
-		rjmp	GB_LOOP
-
-DA_TEST:
-		
-		call 	DA_PRINT_MEM
-		rjmp 	DA_TEST
-
-
-JOY_TEST:
-		call	READ_JOY_L_V
-		call	LCD_PRINT_HEX
-		rjmp	JOY_TEST
-
-
-LCD_BACKLIGHT_TEST:
-		call 	LCD_FLASH_PRINT
-		call	DELAY_N
-		call	DELAY_N
-		
-
-RIGHT8_COUNTER:
-		ldi		r18, $00
-RCOUNTER_LOOP:
-		mov		r16, r18
-		;call	UART_SEND
-		call	RIGHT8_WRITE
-		call	DELAY_N
-		cpi		r18, $0F
-		breq	RIGHT8_COUNTER
-		inc		r18
-		rjmp	RCOUNTER_LOOP
-
-TWI_SEND_TEST:
-		ldi 	ZH, HIGH(TAB_7SEG*2)
-		ldi 	ZL, LOW(TAB_7SEG*2)
-		ldi		r18, $0F
-TEST_LOOP:
-		lpm		r16, Z+
-		ldi		r17, ADDR_RIGHT8
-		call	TWI_SEND
-		call	DELAY_N
-		cpi		r18, $00
-		breq	TWI_SEND_TEST
-		dec		r18
-		rjmp	TEST_LOOP
-
-TWI_SEND_TEST2:
-		ldi		r16, $71
-		ldi		r17, ADDR_RIGHT8
-		call	TWI_SEND
-		call	DELAY_N
-		rjmp	TWI_SEND_TEST2
-
-
-HARD_TEST:
-		lds		r16, LED_STATUS
-		ldi		r16, $03
-		sts		LED_STATUS, r16
-HARD_TEST_LOOP:
-		call	DELAY_N
-		call	ROTLED_RED
-		call	DELAY_N
-		call	ROTLED_OFF
-		call	ROTLED_GREEN
-		call	DELAY_N
-		call	ROTLED_OFF
-		call	ROTLED_BOTH
-		call	DELAY_N
-		call	ROTLED_OFF
-		rjmp	HARD_TEST_LOOP
-
-READ_TEST:
-		ldi		r17, ADDR_SWITCH
-		call	TWI_READ
-		ldi		r17, ADDR_RIGHT8
-		call	TWI_SEND
-		rjmp	READ_TEST
-
-KEY_TEST:
-		call	L1Q
-		brne	NO_KEY
-		call	ROTLED_BOTH
-		rjmp	KEY_TEST
-NO_KEY:
-		call	ROTLED_OFF
-		rjmp	KEY_TEST
-
-KEY_TEST2:
-		call	L1Q
-		breq	KEY_PRESSED
-		call	L2Q
-		breq	KEY_PRESSED
-		call	R1Q
-		breq	KEY_PRESSED
-		call	R2Q
-		breq	KEY_PRESSED
-		call	JOY_LQ
-		breq	KEY_PRESSED
-		call	JOY_RQ
-		breq	KEY_PRESSED
-		call	RQ
-		breq	KEY_PRESSED
-		call	LQ
-		breq	KEY_PRESSED
-		call	ROTLED_OFF
-		rjmp	KEY_TEST2
-KEY_PRESSED:
-		call	ROTLED_BOTH
-		rjmp	KEY_TEST2
 
 
 ;::::::::::::::::
@@ -302,66 +168,13 @@ D1:
 		pop		r25
 		ret
 
-	; ---------------
 
-FW_ANIM1: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
 
-FW_ANIM2: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", "W", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-FW_ANIM3: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", "W", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", " ", "B", "W", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", "w", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
+;::::::::::::::::
+;	Flashminnes-data
+;::::::::::::::::
 
-FW_ANIM4: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", "B", " ", "W", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", "B", "B", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", "B", " ", "B", "B", "W"
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", "B", "B", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", "B", " ", "W", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-
-FW_ANIM5: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", "B", " ", "B", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", "B", " ", " ", " ", "B", "B"
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", "B", " ", "B", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-
-FW_ANIM6: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " ", " ", " ", "B"
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
+		.INCLUDE "flash_messages.asm"
 
 ;::::::::::::::::
 ;	End of file

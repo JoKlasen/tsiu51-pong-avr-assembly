@@ -26,7 +26,8 @@
 ;       * Läs eventuellt in DDRB och or:a in istället vid init (för kompabilitet med högtalaren)
 ;       * Lös bugg med blinkande lampor om få "pixlar" är tända
 ;       * Ändra flashutskriftrutin till att ta argument, så kan man mata in vilken laddad tabell som helst. (Bra för vinstskärmar/animationer?)
-;       
+;         (KLAR se GAMEBOARD_FROM_FLASH_ZPTR)       
+;
 ; ENDTODO
 ;::::::::::::::::
 
@@ -79,25 +80,6 @@ SPI_WAIT:
 ;	DAmatrix
 ;::::::::::::::::
 
-PIC:
-        .db     0b00000000, 0b00000000
-        .db     0b00000110, 0b01100000
-        .db     0b00000110, 0b01100000
-        .db     0b00000000, 0b00000000
-        .db     0b00100000, 0b00000100
-        .db     0b00011000, 0b00011000
-        .db     0b00000111, 0b11100000
-        .db     0b00000000, 0b00000000
-
-PIC_RAM: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "W", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "W", " ", " "
-        .db     " ", "W", "W", "W", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
 
 GAMEBOARD_FROM_FLASH:
         ldi		YH, HIGH(GAMEBOARD)

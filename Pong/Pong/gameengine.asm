@@ -26,22 +26,11 @@
 #ifndef _GAME_ENGINE_
 #define _GAME_ENGINE_
 
-WELCOME_MSG:					; Max 16 tecken, sträng som skrivs ut med LCD_FLASH_PRINT
-		.db		"WELCOME TO PONG!", $00
-READY_MSG:
-		.db		"HIT L/R TO START", $00
-P1_POINT_MSG:
-		.db		"PLAYER 1 SCORES!", $00
-P2_POINT_MSG:
-		.db		"PLAYER 1 SCORES!", $00
-P1_WINS_MSG:
-		.db		" PLAYER 1 WINS! ", $00
-P2_WINS_MSG:					; Max 16 tecken, sträng som skrivs ut med LCD_FLASH_PRINT
-		.db		" PLAYER 2 WINS! ", $00
+
 
 
 ;::::::::::::::::
-;       Titel
+;       Timer
 ;::::::::::::::::
 
 
@@ -70,7 +59,7 @@ TIMER1_INT:
 	call	UPDATE_BALL
 	lds 	r16, COUNTER_UPDATE
 	inc 	r16
-	cpi		r16, $03
+	cpi		r16, $02
 	brne	TIMER_DONE
 	call 	UPDATE_PADDLE1 ; vänstra planket
 	call 	UPDATE_PADDLE2 ; högra planket
@@ -209,7 +198,7 @@ INIT_PADDLES:
 ;       Ball
 ;::::::::::::::::
 
-INIT_BALL:
+/*INIT_BALL:
 		; Startposition
 		ldi 	ZH, HIGH(BALL)
 		ldi 	ZL, LOW(BALL)
@@ -219,7 +208,46 @@ INIT_BALL:
 		st 		Z+, r16 
 		ldi		r16, $06
 		st		Z, r16
+		ret*/
+
+INIT_BALL:
+		; Startposition
+		ldi 	ZH, HIGH(BALL)
+		ldi 	ZL, LOW(BALL)
+		lds		r17, TCNT1L		; pseudo-random-värde hämtat från räknare
+
+		sbrc	r17, 2
+		ldi 	r16, $07
+		sbrs	r17, 2
+		ldi		r16, $08
+		st  	Z+, r16		; X
+
+		mov		r16, r17
+		andi	r16, $07	; Maska med 00000XXX, värde mellan 0-7
+		st 		Z+, r16		; Y
+
+		andi	r17, $0F
+		cpi		r17, $04
+		brlo	DIR_5
+		cpi		r17, $08
+		brlo	DIR_6
+		cpi		r17, $0C
+		brlo	DIR_9
+DIR_10:
+		ldi		r16, $0A
+		rjmp	STORE_DIR
+DIR_9:
+		ldi		r16, $09
+		rjmp	STORE_DIR
+DIR_6:
+		ldi		r16, $06
+		rjmp	STORE_DIR
+DIR_5:
+		ldi		r16, $05
+STORE_DIR:	
+		st		Z, r16		; Riktning
 		ret
+
 
 LOAD_BALL:
 		ldi 	ZH, HIGH(BALL)

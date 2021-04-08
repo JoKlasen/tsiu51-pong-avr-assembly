@@ -10,15 +10,19 @@
 
 ;::::::::::::::::
 ;
-;   Beskrivning
-; 
+;   Rutiner för att spela ljud på kortets pizeoelektriska högtalare.
+;
+;   Genererar med hjälp av interrupts oscillerande på/av signaler på PB1 för att hålla ljudet igång vid
+;   en viss frekvens en satt tid.
+;
+;   Anropas lämpligtvis med hjälp av "PLAY_NOTE_X".
 ;
 ;::::::::::::::::
 
 ;::::::::::::::::
 ;
 ; TODO:
-;       *
+;       * Sekvenser av flera ljud.
 ;
 ; ENDTODO;
 ;::::::::::::::::
