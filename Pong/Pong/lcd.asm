@@ -35,7 +35,7 @@
 
 		; Display kommandon						
 		.equ	FN_SET	= $28	;0b 001(DL)NF--
-		.equ	DISP_ON	= $0F	;0b 00001DCB
+		.equ	DISP_ON	= $0C	;0b 00001DCB
 		.equ	LCD_CLR	= $01	;0b 00000001
 		.equ	E_MODE	= $06	;0b 000001(I/D)S
 		.equ	C_HOME	= $02	;0b 0000001-

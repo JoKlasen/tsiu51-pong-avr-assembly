@@ -26,69 +26,49 @@
 #ifndef _GAME_ENGINE_
 #define _GAME_ENGINE_
 
-
-
-
 ;::::::::::::::::
 ;       Timer
 ;::::::::::::::::
 
-
-	.equ	TIMER1_TICKS = 31250 - 1	; @ 16/256 MHz
+		.equ	TIMER1_TICKS = 31250 - 1	; 1/8 sekund @ 16/64 MHz
 
 TIMER1_INIT:
-	push	r16
-	ldi		r16, (1<<WGM12)|(1<<CS11)|(1<<CS10)	; CTC, prescale 64
-	sts		TCCR1B, r16
-	ldi		r16, HIGH(TIMER1_TICKS)
-	sts		OCR1AH, r16
-	ldi		r16, LOW(TIMER1_TICKS)
-	sts		OCR1AL, r16
-	ldi		r16, (1<<OCIE1A)			; allow to interrupt
-	sts		TIMSK1, r16
-	pop		r16
-	ret
+		push	r16
+		ldi		r16, (1<<WGM12)|(1<<CS11)|(1<<CS10)	; CTC, prescale 64
+		sts		TCCR1B, r16
+		ldi		r16, HIGH(TIMER1_TICKS)
+		sts		OCR1AH, r16
+		ldi		r16, LOW(TIMER1_TICKS)
+		sts		OCR1AL, r16
+		ldi		r16, (1<<OCIE1A)			; allow to interrupt
+		sts		TIMSK1, r16
+		pop		r16
+		ret
 
 TIMER1_INT:
-	push 	r19
-	push 	r18
-	push 	r17
-	push	r16
-	in		r16, SREG
-	push	r16
-	call	UPDATE_BALL
-	lds 	r16, COUNTER_UPDATE
-	inc 	r16
-	cpi		r16, $02
-	brne	TIMER_DONE
-	call 	UPDATE_PADDLE1 ; vänstra planket
-	call 	UPDATE_PADDLE2 ; högra planket
-	clr 	r16
+		push 	r19
+		push 	r18
+		push 	r17
+		push	r16
+		in		r16, SREG
+		push	r16
+		call	UPDATE_BALL
+		lds 	r16, COUNTER_UPDATE
+		inc 	r16
+		cpi		r16, $02
+		brne	TIMER_DONE
+		call 	UPDATE_PADDLE1 ; vänstra planket
+		call 	UPDATE_PADDLE2 ; högra planket
+		clr 	r16
 TIMER_DONE:
-	sts 	COUNTER_UPDATE, r16
-	pop		r16
-	out		SREG, r16
-	pop		r16
-	pop 	r17
-	pop 	r18
-	pop 	r19
-	reti
-
-
-; TIMER0_INIT:
-; 	push 	r16
-; 	ldi		r16, (1<<WGM01)	; CTC, prescale 64
-; 	sts		TCCR0A, r16
-; 	ldi		r16, (1<<CS02)|(1<<CS01)|(1<<CS00)	; CTC, prescale 64
-; 	sts		TCCR0B, r16
-; 	;TCCR0B
-; 	;OCR0A
-	
-
-
-
-
-
+		sts 	COUNTER_UPDATE, r16
+		pop		r16
+		out		SREG, r16
+		pop		r16
+		pop 	r17
+		pop 	r18
+		pop 	r19
+		reti
 
 
 ;::::::::::::::::
@@ -96,65 +76,65 @@ TIMER_DONE:
 ;::::::::::::::::
 
 UPDATE_PADDLE1:
-	; READ_JOY_L_V
-	; JOY i mitten 7F
-	call 	READ_JOY_L_V
-	cpi 	r16, $40			; Gå ner
-	brcs	INC_PADDLE1
-	cpi 	r16, $BF			; Gå upp
-	brcc	DEC_PADDLE1
-	rjmp	RETURN_PADDLE1
+		; READ_JOY_L_V
+		; JOY i mitten 7F
+		call 	READ_JOY_L_V
+		cpi 	r16, $40			; Gå ner
+		brcs	INC_PADDLE1
+		cpi 	r16, $BF			; Gå upp
+		brcc	DEC_PADDLE1
+		rjmp	RETURN_PADDLE1
 DEC_PADDLE1:
-	lds 	r16, PADDLE1+1
-	cpi 	r16, $00
-	breq	RETURN_PADDLE1
-	dec 	r16
-	sts		PADDLE1+1, r16
-	rjmp	RETURN_PADDLE1
+		lds 	r16, PADDLE1+1
+		cpi 	r16, $00
+		breq	RETURN_PADDLE1
+		dec 	r16
+		sts		PADDLE1+1, r16
+		rjmp	RETURN_PADDLE1
 INC_PADDLE1:
-	lds 	r16, PADDLE1+1
-	cpi 	r16, $06
-	breq	RETURN_PADDLE1
-	inc 	r16
-	sts		PADDLE1+1, r16
-	rjmp	RETURN_PADDLE1
+		lds 	r16, PADDLE1+1
+		cpi 	r16, $06
+		breq	RETURN_PADDLE1
+		inc 	r16
+		sts		PADDLE1+1, r16
+		rjmp	RETURN_PADDLE1
 RETURN_PADDLE1:
-	ret
+		ret
 
 
 UPDATE_PADDLE2:
-	; READ_JOY_R_V
-	; JOY i mitten 7E
-	call 	READ_JOY_R_V
-	cpi 	r16, $40			; Gå ner
-	brcs	INC_PADDLE2
-	cpi 	r16, $BF			; Gå upp
-	brcc	DEC_PADDLE2
-	rjmp	RETURN_PADDLE2
+		; READ_JOY_R_V
+		; JOY i mitten 7E
+		call 	READ_JOY_R_V
+		cpi 	r16, $40			; Gå ner
+		brcs	INC_PADDLE2
+		cpi 	r16, $BF			; Gå upp
+		brcc	DEC_PADDLE2
+		rjmp	RETURN_PADDLE2
 DEC_PADDLE2:
-	lds 	r16, PADDLE2+1
-	cpi 	r16, $00
-	breq	RETURN_PADDLE2
-	dec 	r16
-	sts		PADDLE2+1, r16
-	rjmp	RETURN_PADDLE2
+		lds 	r16, PADDLE2+1
+		cpi 	r16, $00
+		breq	RETURN_PADDLE2
+		dec 	r16
+		sts		PADDLE2+1, r16
+		rjmp	RETURN_PADDLE2
 INC_PADDLE2:
-	lds 	r16, PADDLE2+1
-	cpi 	r16, $06
-	breq	RETURN_PADDLE2
-	inc 	r16
-	sts		PADDLE2+1, r16
-	rjmp	RETURN_PADDLE2
+		lds 	r16, PADDLE2+1
+		cpi 	r16, $06
+		breq	RETURN_PADDLE2
+		inc 	r16
+		sts		PADDLE2+1, r16
+		rjmp	RETURN_PADDLE2
 RETURN_PADDLE2:
-	ret
+		ret
 
 LOAD_PADDLES:
-	ldi 	ZH, HIGH(PADDLE1)
-	ldi 	ZL, LOW(PADDLE1)
-	call	LOAD_ONE_PADDLE
-	; Z = PADDLE2
-	call	LOAD_ONE_PADDLE
-	ret
+		ldi 	ZH, HIGH(PADDLE1)
+		ldi 	ZL, LOW(PADDLE1)
+		call	LOAD_ONE_PADDLE
+		; Z = PADDLE2
+		call	LOAD_ONE_PADDLE
+		ret
 
 LOAD_ONE_PADDLE:
 	    ldi		YH, HIGH(GAMEBOARD)
@@ -280,21 +260,7 @@ UPDATE_BALL:
 		call	CHECK_PADDLE_COLLISION
 		call	WALL_BOUNCE
 		ret
-		
 
-
-
-		; kolla om bollens X koord är 0/15
-		; 	om ja, ge poäng (break)
-
-		; kolla om bollens X koord är 1/14
-		; 	om ja, kolla om Y koord är samma som plank eller plank+1
-		; 		om ja, byt riktning
-		;		om nej, flytta
-		; 	om nej, flytta
-		; kolla om bollens Y koord är vid tak/golv
-		; 	om ja, byt riktning
-		;	om nej, flytta
 		
 CHECK_SCORING:
 		lds 	r16, (BALL)		; bollens X
@@ -428,43 +394,42 @@ CLEAR_GAMEBOARD_LOOP:
 ;::::::::::::::::	
 
 PLAYER_SCORED: ; kontrollerar om spelaren och gjort mål och inc score:n
-	
-	lds		r16, PLAYER1_SCORED
-	cpi		r16, 1
-	breq	INC_P1_SCORE
-	lds		r16, PLAYER2_SCORED
-	cpi		r16, 1
-	breq	INC_P2_SCORE
-	rjmp 	PLAYER_SCORED_DONE
+		lds		r16, PLAYER1_SCORED
+		cpi		r16, 1
+		breq	INC_P1_SCORE
+		lds		r16, PLAYER2_SCORED
+		cpi		r16, 1
+		breq	INC_P2_SCORE
+		rjmp 	PLAYER_SCORED_DONE
 INC_P1_SCORE:
-	clr 	r16
-	sts		PLAYER1_SCORED, r16
-	lds     r16, P1_SCORE
-	inc		r16
-	sts		P1_SCORE, r16
-	cpi 	r16, $05
-	brne	P1_NO_WIN
-	ldi 	r17, $01
-	sts		PLAYER_WIN, r17
+		clr 	r16
+		sts		PLAYER1_SCORED, r16
+		lds     r16, P1_SCORE
+		inc		r16
+		sts		P1_SCORE, r16
+		cpi 	r16, $05
+		brne	P1_NO_WIN
+		ldi 	r17, $01
+		sts		PLAYER_WIN, r17
 P1_NO_WIN:
-	call	LEFT8_WRITE
-	call 	INIT_BALL
-	rjmp	PLAYER_SCORED_DONE
+		call	LEFT8_WRITE
+		call 	INIT_BALL
+		rjmp	PLAYER_SCORED_DONE
 INC_P2_SCORE:
-	clr 	r16
-	sts		PLAYER2_SCORED, r16
-	lds     r16, P2_SCORE
-	inc		r16
-	sts		P2_SCORE, r16
-	cpi		r16, $05
-	brne 	P2_NO_WIN
-	ldi 	r17, $01
-	sts 	PLAYER_WIN, r17
+		clr 	r16
+		sts		PLAYER2_SCORED, r16
+		lds     r16, P2_SCORE
+		inc		r16
+		sts		P2_SCORE, r16
+		cpi		r16, $05
+		brne 	P2_NO_WIN
+		ldi 	r17, $01
+		sts 	PLAYER_WIN, r17
 P2_NO_WIN:
-	call 	RIGHT8_WRITE
-	call 	INIT_BALL
+		call 	RIGHT8_WRITE
+		call 	INIT_BALL
 PLAYER_SCORED_DONE:
-	ret
+		et
 
 CHECK_WIN:
 		lds 	r16, PLAYER_WIN
@@ -477,48 +442,48 @@ CHECK_WIN:
 
 
 PONG:
-	call	DELAY
-	call	DELAY
-	call	DELAY
-	
-	call 	UPDATE
-	call 	DA_PRINT_MEM
-	call	CHECK_WIN
-	breq	WIN
-	rjmp 	PONG
+		call	DELAY
+		call	DELAY
+		call	DELAY
+		
+		call 	UPDATE
+		call 	DA_PRINT_MEM
+		call	CHECK_WIN
+		breq	WIN
+		rjmp 	PONG
 WIN:
-	cli
-	call	PRINT_WIN_MSG
-	call	FIREWORKS
-	; Spela ljud
-	ldi 	r16, $03
-	call	DELAY_S		; 3 sekunder
-	call	LCD_ERASE
-	ret
+		cli
+		call	PRINT_WIN_MSG
+		; call	FIREWORKS
+		; Spela ljud
+		ldi 	r16, $03
+		call	DELAY_S		; 3 sekunder
+		call	LCD_ERASE
+		ret
 
 UPDATE:
-	call 	CLEAR_GAMEBOARD
-	call	LOAD_PADDLES
-	call	LOAD_BALL
-	call 	LOAD_DA_MEM
-	call 	PLAYER_SCORED
-	ret
+		call 	CLEAR_GAMEBOARD
+		call	LOAD_PADDLES
+		call	LOAD_BALL
+		call 	LOAD_DA_MEM
+		call 	PLAYER_SCORED
+		ret
 
 ; Laddar kordinaterna till Gameboard
 
 PRINT_WIN_MSG:
-	lds 	r16, P1_SCORE
-	cpi 	r16, $05
-	brne	OTHER_PLAYER
-	ldi 	ZH, HIGH(P1_WINS_MSG*2)
-	ldi 	ZL, LOW(P1_WINS_MSG*2)
-	rjmp 	WIN_MSG_LOADED
-OTHER_PLAYER:
-	ldi 	ZH, HIGH(P2_WINS_MSG*2)
-	ldi 	ZL, LOW(P2_WINS_MSG*2)
+		lds 	r16, P1_SCORE
+		cpi 	r16, $05
+		brne	OTHER_PLAYER
+		ldi 	ZH, HIGH(P1_WINS_MSG*2)
+		ldi 	ZL, LOW(P1_WINS_MSG*2)
+		rjmp 	WIN_MSG_LOADED
+	OTHER_PLAYER:
+		ldi 	ZH, HIGH(P2_WINS_MSG*2)
+		ldi 	ZL, LOW(P2_WINS_MSG*2)
 WIN_MSG_LOADED:
-	call 	LCD_FLASH_PRINT
-	ret
+		call 	LCD_FLASH_PRINT
+		ret
 
 GAME_INIT:
 		call 	INIT_PADDLES
