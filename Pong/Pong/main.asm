@@ -101,8 +101,9 @@ MAIN:
 		brne	MAIN
 
 	; Töm LCDn på "redo"-meddelandet
-		call	LINE_INIT
-		call	LINE_PRINT
+		;call	LINE_INIT
+		;call	LINE_PRINT
+		call	LCD_ERASE
 
 	; Starta spelet
 		call 	GAME_INIT
