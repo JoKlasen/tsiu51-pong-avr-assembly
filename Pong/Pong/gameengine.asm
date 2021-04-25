@@ -275,7 +275,7 @@ BALL_NO_CARRY_X:
 	
 UPDATE_BALL:
 
-		call	CHECK_SCORING
+		call	CHECK_SCORING	; ska inte update ball avbryta här om en bollen är i vägg??
 		call	MOVE_BALL
 		call	CHECK_PADDLE_COLLISION
 		call	WALL_BOUNCE
