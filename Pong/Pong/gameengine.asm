@@ -15,14 +15,6 @@
 ;
 ;::::::::::::::::
 
-;::::::::::::::::
-;
-; TODO:
-;       *
-;
-; ENDTODO
-;::::::::::::::::
-
 #ifndef _GAME_ENGINE_
 #define _GAME_ENGINE_
 

@@ -9,21 +9,6 @@
 ;::::::::::::::::::::::::::::::::::::::::::::
 
 
-;::::::::::::::::
-; �vergripande beskrivning av programmet f�r dokumentation
-; Fyll p� h�r eftersom
-;
-;::::::::::::::::
-
-
-;::::::::::::::::
-;
-; TODO:
-;       * Massor
-;       
-;       
-; ENDTODO
-;::::::::::::::::
 
         .INCLUDE "port_definitions.asm"
 
