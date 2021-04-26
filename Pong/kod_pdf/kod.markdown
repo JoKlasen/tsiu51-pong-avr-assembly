@@ -5,7 +5,7 @@
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
@@ -30,8 +30,6 @@
 		.equ	ADDR_RIGHT8	= $25		; IC3
 		.equ	ADDR_ROTLED	= $26		; IC4
 		.equ	ADDR_SWITCH	= $27		; IC5			
-		;.equ	SLA_W		= (ADDR_RIGHT8 << 1) | 0	; $4A 0b01001010
-		;.equ	SLA_R		= (ADDR_RIGHT8 << 1) | 1	; $4B 0b01001011
 
 ;::::::::::::::::
 ;	Arduino pins
@@ -116,7 +114,7 @@
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
@@ -139,10 +137,6 @@
 		.org	SRAM_START
 
 
-
-LED_STATUS:
-        .byte   1
-
 RIGHT8_VAL:
 		.byte	1
 LEFT8_VAL:
@@ -152,13 +146,7 @@ LEFT8_VAL:
 LCD_PORT:
 		.byte	1
 LINE:
-		.byte	17
-LCD_LINE1:
-	    .byte	17
-LCD_LINE2:
-	    .byte	17        
-CURSOR:	
-        .byte	1						; Cursor-position
+		.byte	17       
 
 
 NOTE_LENGTH:
@@ -166,7 +154,6 @@ NOTE_LENGTH_LOW:
 		.byte	1
 NOTE_LENGTH_HIGH:
 		.byte 	1
-
 
         
 DAMATRIX_MEM: ; Vidominnet
@@ -212,24 +199,24 @@ GB_ROW8:
 COMPONENT_TABLE:
 	PADDLE1:
 		;x,y
-		.byte 2
+		.byte 	2
 	PADDLE2:
 		;x,y
-		.byte 2	
+		.byte 	2	
 	BALL:
 		;x,y,riktning
-		.byte 3
+		.byte 	3
 
 PLAYER2_SCORED:
-		.byte 1
+		.byte 	1
 PLAYER1_SCORED:
-		.byte 1
+		.byte 	1
 P1_SCORE:
-		.byte 1
+		.byte 	1
 P2_SCORE:
-		.byte 1	
+		.byte 	1	
 PLAYER_WIN:
-		.byte 1
+		.byte 	1
 
 COUNTER_UPDATE:
 		.byte	1
@@ -242,16 +229,16 @@ COUNTER_UPDATE:
 ;	End of file
 ;::::::::::::::::
 
+
 ;::::::::::::::::::::::::::::::::::::::::::::
 ;
 ; main.asm
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
-
 
 
         .INCLUDE "port_definitions.asm"
@@ -269,7 +256,6 @@ COUNTER_UPDATE:
         .INCLUDE "twi.asm" 
         .INCLUDE "switches.asm"
         .INCLUDE "7seg.asm"
-        .INCLUDE "led.asm"
 		.INCLUDE "lcd.asm"
 		.INCLUDE "DAmatrix.asm"
 		.INCLUDE "gameengine.asm"
@@ -309,7 +295,7 @@ COLD:
 		ldi 	r16, $02
 		call	DELAY_S
 		
-				; Kör MAIN, eller välj ett testprogram från tests.asm
+	; Kör MAIN, eller välj ett testprogram från tests.asm
 		jmp		MAIN
 
 ;::::::::::::::::
@@ -330,8 +316,6 @@ MAIN:
 		brne	MAIN
 
 	; Töm LCDn på "redo"-meddelandet
-		;call	LINE_INIT
-		;call	LINE_PRINT
 		call	LCD_ERASE
 
 	; Starta spelet
@@ -346,7 +330,7 @@ MAIN:
 ;	Subrutiner
 ;::::::::::::::::
 
-;::	V�nterutiner ::
+;::	Vänterutiner ::
 
 WAIT:
 		push	r16
@@ -373,7 +357,7 @@ DELAY_S1:
 	; ---------------
 
 
-DELAY_N:						; L�ngre v�nteloop, styrt av N som �r definerat i b�rjan under "Data".
+DELAY_N:						; Längre vänteloop, styrt av N som är definerat i början av filen.
 		push	r16
 		ldi		r16, N
 DELAY_N1:
@@ -386,10 +370,10 @@ DELAY_N1:
 	; ---------------
 
 DELAY:						
-								; V�nte-loop, upp till ~16 ms ($FFFF, h�r 10 ms
+								; Vänte-loop, upp till ~16 ms ($FFFF), här 10 ms
 		push	r25
 		push	r24
-		ldi 	r25, $63		; $63C4 ger 160000 cykler f�r hela rutinen, i princip exakt 10.0 ms
+		ldi 	r25, $63		; $63C4 ger 160000 cykler för hela rutinen, i princip exakt 10.0 ms
 		ldi 	r24, $C4	
 D1:
 		adiw	r24, 1
@@ -410,13 +394,14 @@ D1:
 ;	End of file
 ;::::::::::::::::
 
+
 ;::::::::::::::::::::::::::::::::::::::::::::
 ;
 ; gameengine.asm
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
@@ -431,7 +416,7 @@ D1:
 #define _GAME_ENGINE_
 
 ;::::::::::::::::
-;       Timer
+;	Timer
 ;::::::::::::::::
 
 		.equ	TIMER1_TICKS = 31250 - 1	; 1/8 sekund @ 16/64 MHz
@@ -476,7 +461,7 @@ TIMER_DONE:
 
 
 ;::::::::::::::::
-;       Paddles
+;	Paddles
 ;::::::::::::::::
 
 UPDATE_PADDLE1:
@@ -579,7 +564,7 @@ INIT_PADDLES:
 
 
 ;::::::::::::::::
-;       Ball
+;	Ball
 ;::::::::::::::::
 
 /*INIT_BALL:
@@ -732,14 +717,14 @@ NO_COLLISION:
 
 ; Generell studs mot paddel
 PADDLE_BOUNCE:
-		lds 	r16, (BALL)		; bollens X
-		lds		r18, (BALL+2)	; "riktning"
+		lds 	r16, (BALL)				; bollens X
+		lds		r18, (BALL+2)			; "riktning"
 
 		ldi 	r19, $01
 		cpi 	r16, $01
-		breq	PADDLE_BOUNCE_LEFT	; vänster vägg, -1 på riktning
+		breq	PADDLE_BOUNCE_LEFT		; vänster vägg, -1 på riktning
 		cpi 	r16, $0E
-		breq	PADDLE_BOUNCE_RIGHT	; höger vägg, +1 på riktning
+		breq	PADDLE_BOUNCE_RIGHT		; höger vägg, +1 på riktning
 		rjmp 	PADDLE_BOUNCE_DONE
 PADDLE_BOUNCE_LEFT:
 		sub 	r18, r19
@@ -756,14 +741,14 @@ PADDLE_BOUNCE_DONE:
 
 ; Generell studs tak/golv
 WALL_BOUNCE:
-		lds 	r17, (BALL+1)	; bollens Y
-		lds		r18, (BALL+2)	; "riktning"
+		lds 	r17, (BALL+1)			; bollens Y
+		lds		r18, (BALL+2)			; "riktning"
 		
 		ldi 	r19, $04
 		cpi 	r17, $00
-		breq	WALL_BOUNCE_TOP	; tak, -4 på riktning
+		breq	WALL_BOUNCE_TOP			; tak, -4 på riktning
 		cpi 	r17, $07
-		breq	WALL_BOUNCE_BOT	; golv, +4 på riktning
+		breq	WALL_BOUNCE_BOT			; golv, +4 på riktning
 		rjmp 	WALL_BOUNCE_DONE
 WALL_BOUNCE_TOP:
 		sub 	r18, r19
@@ -779,14 +764,14 @@ WALL_BOUNCE_DONE:
 		ret
 
 ;::::::::::::::::
-;       Gameboard
+;	Gameboard
 ;::::::::::::::::
 
 CLEAR_GAMEBOARD:
         ldi		YH, HIGH(GAMEBOARD)
 		ldi		YL, LOW(GAMEBOARD)
 		clr 	r16
-        ldi     r17, $80            ; 8 rader x 16 bytes
+        ldi     r17, $80            	; 8 rader x 16 bytes
 CLEAR_GAMEBOARD_LOOP:
         st      Y+, r16
         dec     r17
@@ -794,7 +779,7 @@ CLEAR_GAMEBOARD_LOOP:
         ret
 
 ;::::::::::::::::
-;       If scored
+;	If scored
 ;::::::::::::::::	
 
 PLAYER_SCORED: ; kontrollerar om spelaren och gjort mål och inc score:n
@@ -833,7 +818,7 @@ P2_NO_WIN:
 		call 	RIGHT8_WRITE
 		call 	INIT_BALL
 PLAYER_SCORED_DONE:
-		et
+		ret
 
 CHECK_WIN:
 		lds 	r16, PLAYER_WIN
@@ -841,7 +826,7 @@ CHECK_WIN:
 		ret
 
 ;::::::::::::::::
-;       GAMELOOP
+;	GAMELOOP
 ;::::::::::::::::	
 
 
@@ -858,8 +843,6 @@ PONG:
 WIN:
 		cli
 		call	PRINT_WIN_MSG
-		; call	FIREWORKS
-		; Spela ljud
 		ldi 	r16, $03
 		call	DELAY_S		; 3 sekunder
 		call	LCD_ERASE
@@ -917,13 +900,14 @@ GAME_INIT:
 ;	End of file
 ;::::::::::::::::
 
+
 ;::::::::::::::::::::::::::::::::::::::::::::
 ;
 ; DAmatrix.asm
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
@@ -935,27 +919,16 @@ GAME_INIT:
 ;
 ;   Den finns rutiner för att skriva ut stillbilder från tabeller i flash som laddas till videominnet, 
 ;   men det är tänkt att man ska sköta detta genom regelbunden överföring från minnestabellen "GAMEBOARD" genom "LOAD_DA_MEM"
-; 
 ;
 ;::::::::::::::::
 
-;::::::::::::::::
-;
-; TODO:
-;       * Läs eventuellt in DDRB och or:a in istället vid init (för kompabilitet med högtalaren)
-;       * Lös bugg med blinkande lampor om få "pixlar" är tända
-;       * Ändra flashutskriftrutin till att ta argument, så kan man mata in vilken laddad tabell som helst. (Bra för vinstskärmar/animationer?)
-;         (KLAR se GAMEBOARD_FROM_FLASH_ZPTR)       
-;
-; ENDTODO
-;::::::::::::::::
 
 #ifndef _DAMATRIX_
 #define _DAMATRIX_
 
 
 ;::::::::::::::::
-;       SPI
+;	SPI
 ;::::::::::::::::
 
 SPI_MasterInit:
@@ -967,13 +940,15 @@ SPI_MasterInit:
         out     SPCR, r17
         ret
 
+	; ---------------
+
 SPI_OPEN:
-    push    r16
-    in      r16, PORTB
-    cbr     r16, (1<<MATRIX_LATCH)
-    out     PORTB, r16
-    pop     r16
-    ret
+		push    r16
+		in      r16, PORTB
+		cbr     r16, (1<<MATRIX_LATCH)
+		out     PORTB, r16
+		pop     r16
+		ret
 
 SPI_CLOSE:
         push    r16
@@ -983,7 +958,7 @@ SPI_CLOSE:
         pop     r16
         ret
 
-
+	; ---------------
 
 SPI_SEND_BYTE:
 ; Start transmission of data (r16)
@@ -1028,44 +1003,9 @@ DA_MEM_FLASH_LOOP:
         brne    DA_MEM_FLASH_LOOP
         ret
 
-;:::::::::::
-; Animering    
-;:::::::::::
-
-GAMEBOARD_FROM_FLASH_ZPTR:			; Tar tabell som argument i Z-pekaren
-        ldi		YH, HIGH(GAMEBOARD)
-		ldi		YL, LOW(GAMEBOARD)
-        ldi     r17, $80            ; 8 rader x 16 bytes
-GAMEBOARD_FROM_FLASH_ZPTR_LOOP:
-        lpm     r16, Z+
-        st      Y+, r16
-        dec     r17
-        brne    GAMEBOARD_FROM_FLASH_ZPTR_LOOP
-        ret
-
-FIREWORKS:
-		ldi		ZH, HIGH(FW_ANIM1*2)
-		ldi		ZL, LOW(FW_ANIM1*2)
-		call	GAMEBOARD_FROM_FLASH_ZPTR
-		call	LOAD_DA_MEM
-		call	DA_PRINT_MEM
-		call	DELAY_N
-		ldi		ZH, HIGH(FW_ANIM2*2)
-		ldi		ZL, LOW(FW_ANIM2*2)
-		call	GAMEBOARD_FROM_FLASH_ZPTR
-		call	LOAD_DA_MEM
-		call	DA_PRINT_MEM
-		call	DELAY_N
-		ldi		ZH, HIGH(FW_ANIM3*2)
-		ldi		ZL, LOW(FW_ANIM3*2)
-		call	GAMEBOARD_FROM_FLASH_ZPTR
-		call	LOAD_DA_MEM
-		call	DA_PRINT_MEM
-		call	DELAY_N
-		ret
 
 ;:::::::::::
-; Gameboard        
+; 	Gameboard        
 ;:::::::::::
 
 
@@ -1075,13 +1015,13 @@ LOAD_DA_MEM:
         push    YL
         push    ZH
         push    ZL
-        ldi	YH, HIGH(DAMATRIX_MEM)
-	ldi	YL, LOW(DAMATRIX_MEM)
-        ldi	ZH, HIGH(GAMEBOARD)
-	ldi	ZL, LOW(GAMEBOARD)
+        ldi		YH, HIGH(DAMATRIX_MEM)
+		ldi		YL, LOW(DAMATRIX_MEM)
+        ldi		ZH, HIGH(GAMEBOARD)
+		ldi		ZL, LOW(GAMEBOARD)
 
         ldi     r17, 16
-LOAD_DA_MEM_LOOP: ; kör 16 gånger (2 displayer) * (8 rader)
+LOAD_DA_MEM_LOOP: 				; kör 16 gånger (2 displayer) * (8 rader)
         call    READ_GAMEBOARD_TO_DA
         dec     r17
         brne    LOAD_DA_MEM_LOOP
@@ -1141,7 +1081,9 @@ END_IF:
         pop     r17
         pop     r16
         ret
-              
+
+	; ---------------
+
 ; överför en byte till videominnet              
 DA_TRANSFER_BYTE_TO_DA_MEM:
         st Y+, r17
@@ -1149,15 +1091,14 @@ DA_TRANSFER_BYTE_TO_DA_MEM:
         st Y+, r19
         ret
 
-
 ;:::::::::::
-; Videominnet        
+; 	Videominnet        
 ;:::::::::::
         
 ; initierar videominnet med 0:or
 DA_MEM_INIT:
-        ldi	ZH, HIGH(DAMATRIX_MEM)
-	ldi	ZL, LOW(DAMATRIX_MEM)
+        ldi		ZH, HIGH(DAMATRIX_MEM)
+		ldi		ZL, LOW(DAMATRIX_MEM)
         ldi     r17, $30            ; 8 rader x 6 bytes
 DA_MEM_INIT_LOOP:
         ldi     r16, $00
@@ -1166,26 +1107,21 @@ DA_MEM_INIT_LOOP:
         brne    DA_MEM_INIT_LOOP
         ret
 
-
-
 ;:::::::::::
-; Print av videominnet        
+; 	Print av videominnet        
 ;:::::::::::
 
 DA_PRINT_MEM:
-        ldi	ZH, HIGH(DA_ROW8 + 6)
-        ldi	ZL, LOW(DA_ROW8 + 6)
-        ldi     r17, $80 ;0b 1000 0000
-        ;call    SPI_OPEN
+        ldi		ZH, HIGH(DA_ROW8 + 6)
+        ldi		ZL, LOW(DA_ROW8 + 6)
+        ldi     r17, $80 			;0b 1000 0000
 DA_PRINT_MEM_LOOP:
         call    DA_PRINT_ROW
         brne    DA_PRINT_MEM_LOOP
-        ;call    SPI_CLOSE
         ret
         ; $FF - (radnr)^2
 
 DA_PRINT_ROW:
-
         ; Sätt rad
         mov     r18, r17
         com     r18
@@ -1215,13 +1151,14 @@ DA_PRINT_ONE_DISPLAY_LOOP:
 ;	End of file
 ;::::::::::::::::
 
+
 ;::::::::::::::::::::::::::::::::::::::::::::
 ;
 ; twi.asm
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
@@ -1238,16 +1175,6 @@ DA_PRINT_ONE_DISPLAY_LOOP:
 ;
 ;::::::::::::::::
 
-;::::::::::::::::
-;
-; TODO:
-;       * Lägg till felkodshantering
-;       * Interuppt-säkra
-;       * Gör varianter för att skicka/ta emot mer än 1 byte vid varje transaktion.
-;       * Anpassa eventuellt namn till drivrutins-standard
-;		
-; ENDTODO
-;::::::::::::::::
 
 #ifndef _TWI_
 #define _TWI_
@@ -1370,40 +1297,29 @@ READ_BYTE:
 ;	End of file
 ;::::::::::::::::
 
+
 ;::::::::::::::::::::::::::::::::::::::::::::
 ;
 ; switches.asm
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
 ;::::::::::::::::
 ;
-; Modulen för hantering av DAvid-kortets knappar
+; Modulen för hantering av DAvid-kortets knappar och joysticks.
 ;
 ; Använder just nu query-anrop för enskilda knappar, sätter Z-flaggan vid knapptryck.
+; READ_JOY_(R/L)_(H/V) ger ett AD-värde mellan 0-255 i r16.
 ;
 ;::::::::::::::::
 
-; 0b RY+ RY- RX+ RX- LY+ LY- LX+ LX-
-; 0b 0 0
-
-;::::::::::::::::
-;
-; TODO:
-;		* Gör rutiner för joysticksen. (DELVIS KLAR)
-;		* Avkoda AD-signaler från dom båda joysticksens två axlar på ett bättre sätt (förslag: 1byte - 2bits/axel för båda joysticksen genom tabell-intervall)
-;       * Skriv eventuellt alternativ rutin för att kolla samtliga knappar, eller avkoda SWITCHES.
-;
-; ENDTODO
-;::::::::::::::::
 
 #ifndef _SWITCH_
 #define _SWITCH_
-
 
 	; "Neutralvärde för joystick axlar"
 		.equ	VAL_JOY_R_H		= $83		; Höger joystick x-led
@@ -1421,39 +1337,8 @@ RQ:
 		sez
 		ret
 
-
-R1Q:
-		call	SWITCHES		; Flytta eventuellt ut och g�r ett gemensamt call f�r samtliga queries? Eller ska dom kunna kallas separat?
-		clz						; SWITCHES verkar s�tta Z-flaggan i n�got steg, s� denna beh�vs efter. Mer r�tt med en sbrc innan. Eller kanske v�nda p� sbrs under f�r f�rre instruktioner?
-		sbrs	r16, SW_R1		; Kollar om bit SW_R1 (0) i r16 (h�mtat fr�n switches) �r 0 och s�tter d� Z-flaggan
-		sez
-		ret
-
-
-
-R2Q:
-		call	SWITCHES
-		clz		
-		sbrs	r16, SW_R2
-		sez
-		ret
-
 LQ:
 		sbis	PIND, SW_L
-		sez
-		ret
-
-L1Q:
-		call	SWITCHES
-		clz		
-		sbrs	r16, SW_L1
-		sez
-		ret
-
-L2Q:
-		call	SWITCHES
-		clz		
-		sbrs	r16, SW_L2
 		sez
 		ret
 
@@ -1483,8 +1368,7 @@ SWITCHES:
 ;	Joystick
 ;::::::::::::::::
 
-
-
+; Samtliga dessa genererar ett AD-värde som lagras i r16
 
 READ_JOY_R_H:
 		ldi		r16, (1<<REFS0)|(1<<ADLAR)|JOY_R_H		; Väljer kanal för AD-omvandlaren, med 5v referens-spänning och left adjust (8 bitar)
@@ -1513,11 +1397,8 @@ READ_JOY_L_V:
     ; ---------------
 
 ADC_READ8:								; Returnerar ett värde mellan 0-255 från vald ADC-kanal till r16
-		;ldi		r16, (1<<REFS0)|(1<<ADLAR)|PC0
-		;sts		ADMUX, r16
 		ldi		r16, (1<<ADEN)|7		; Sätt AD-enable och prescaler till 128 (=> 125 kHz)
 		sts		ADCSRA, r16
-
 ADC_CONVERT:							; Starta omvandling
 		lds		r16, ADCSRA
 		ori		r16, (1<<ADSC)
@@ -1537,13 +1418,14 @@ ADC_BUSY:								; Vänta tills omvandling är klar
 ;	End of file
 ;::::::::::::::::
 
+
 ;::::::::::::::::::::::::::::::::::::::::::::
 ;
 ; speaker.asm
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
@@ -1558,13 +1440,6 @@ ADC_BUSY:								; Vänta tills omvandling är klar
 ;
 ;::::::::::::::::
 
-;::::::::::::::::
-;
-; TODO:
-;       * Sekvenser av flera ljud.
-;
-; ENDTODO;
-;::::::::::::::::
 
 #ifndef _SPEAKER_
 #define _SPEAKER_
@@ -1586,38 +1461,13 @@ ADC_BUSY:								; Vänta tills omvandling är klar
 
 
 ;::::::::::::::::
-;       Titel
+;	Anrops-rutiner
 ;::::::::::::::::
-
-
-TIMER2_INIT:
-        push 	r16
-                                            ; Set data direction till output för Speaker pin
-        ;ldi	r16, (1<<SPEAKER)
-	;out	DDRB, r16
-        sbi     DDRB, SPEAKER
-		
-        ldi	r16, (1<<WGM21)	; CTC
-        sts	TCCR2A, r16
-        ldi	r16, (0<<CS22)|(1<<CS21)|(1<<CS20)	; prescale 32
-        sts	TCCR2B, r16
-        pop     r16
-        ret
-
-ENABLE_SPEAKER_INT:
-        ldi	r16, (1<<OCIE2A)			; allow to interrupt
-	sts	TIMSK2, r16
-        ret
-
-DISABLE_SPEAKER_INT:
-        ldi	r16, (0<<OCIE2A)			; allow to interrupt
-	sts	TIMSK2, r16
-        ret
 
 PLAY_NOTE_G:
         ldi     r16, NOTE_G
         sts     OCR2A, r16
-        ldi	r16, NOTE_G_005_H
+        ldi		r16, NOTE_G_005_H
         sts 	NOTE_LENGTH_HIGH, r16
         ldi 	r16, NOTE_G_005_L
         sts 	NOTE_LENGTH_LOW, r16
@@ -1627,7 +1477,7 @@ PLAY_NOTE_G:
 PLAY_NOTE_A:
         ldi     r16, NOTE_A
         sts     OCR2A, r16
-        ldi	r16, NOTE_A_005_H
+        ldi		r16, NOTE_A_005_H
         sts 	NOTE_LENGTH_HIGH, r16
         ldi 	r16, NOTE_A_005_L
         sts 	NOTE_LENGTH_LOW, r16
@@ -1637,41 +1487,73 @@ PLAY_NOTE_A:
 PLAY_NOTE_B:
         ldi     r16, NOTE_B
         sts     OCR2A, r16
-        ldi	r16, NOTE_B_005_H
+        ldi		r16, NOTE_B_005_H
         sts 	NOTE_LENGTH_HIGH, r16
         ldi 	r16, NOTE_B_005_L
         sts 	NOTE_LENGTH_LOW, r16
         call    ENABLE_SPEAKER_INT
         ret
 
+;::::::::::::::::
+;	Avbrotts-rutin
+;::::::::::::::::
+
+
+TIMER2_INIT:
+        push 	r16
+                                        	; Set data direction till output för Speaker pin
+        sbi     DDRB, SPEAKER
+		
+        ldi		r16, (1<<WGM21)				; CTC
+        sts		TCCR2A, r16
+        ldi		r16, (0<<CS22)|(1<<CS21)|(1<<CS20)	; prescale 32
+        sts		TCCR2B, r16
+        pop     r16
+        ret
+
+	; ---------------
+
+ENABLE_SPEAKER_INT:
+        ldi		r16, (1<<OCIE2A)			; allow to interrupt
+		sts		TIMSK2, r16
+        ret
+
+DISABLE_SPEAKER_INT:
+        ldi		r16, (0<<OCIE2A)			; allow to interrupt
+		sts		TIMSK2, r16
+        ret
+
 STOP_SPEAKER:
-        cbi	PORTB, PB1
+        cbi		PORTB, PB1
         call    DISABLE_SPEAKER_INT
         ret
 
+	; ---------------
+
 SPEAKER_TIMER_INT:
         push	r16
-        in	r16, SREG
+        in		r16, SREG
         push	r16
 
         call    TOGGLE_SPEAKER
-	call	CHECK_NOTE_LENGTH
+		call	CHECK_NOTE_LENGTH
 
-        pop	r16
-        out	SREG, r16
-        pop	r16
+        pop		r16
+        out		SREG, r16
+        pop		r16
         reti
 
+	; ---------------
 
 TOGGLE_SPEAKER:
         sbis    PORTB, PB1
     	rjmp    TOGGLE_SPEAKER_ON
         rjmp    TOGGLE_SPEAKER_OFF
 TOGGLE_SPEAKER_ON:
-        sbi	PORTB, PB1
+        sbi		PORTB, PB1
         rjmp    TOGGLE_SPEAKER_DONE
 TOGGLE_SPEAKER_OFF:		
-	cbi	PORTB, PB1
+		cbi		PORTB, PB1
 TOGGLE_SPEAKER_DONE:
         ret
 
@@ -1687,11 +1569,13 @@ CHECK_NOTE_LENGTH:
         sts 	NOTE_LENGTH_HIGH, r25
         rjmp 	CHECK_NOTE_DONE
 STOP_NOTE:
-	call	STOP_SPEAKER
+		call	STOP_SPEAKER
 CHECK_NOTE_DONE:
-	pop 	r24
-	pop 	r25
-	ret
+		pop 	r24
+		pop 	r25
+		ret
+
+	; ---------------
 
 #endif /* _SPEAKER_ */
 ;::::::::::::::::
@@ -1712,23 +1596,11 @@ CHECK_NOTE_DONE:
 ;
 ; Modulen för utskrifter på 2x16 LCDn på DAvid.
 ;
-; Omgjord för överföring med TWI-protokoll.
 ; Används primärt genom att lagra meddelanden i LINE i SRAM och använda LINE_PRINT, 
 ; eller hårdkodat meddelande i .db, anropat med LCD_FLASH_PRINT och meddelandet laddat i Z-pekaren
 ;
 ;::::::::::::::::
 
-;::::::::::::::::
-;
-; TODO:
-;       * Gör om rutinerna för att funka med TWI (KLAR)
-;       * Stöd för att skriva till båda raderna
-;		* Ändra så att LCD_FLASH_PRINT skriver från ett valbart meddelande i flash, skickat som argument (KLAR)
-;		* (Ev. samma för LINE, eller bygg på med bättre rutiner för att skriva saker dit.)
-;		* Integrera knappstyrning?
-;       
-; ENDTODO
-;::::::::::::::::
 
 #ifndef _LCD_
 #define _LCD_
@@ -1740,8 +1612,6 @@ CHECK_NOTE_DONE:
 		.equ	E_MODE	= $06	;0b 000001(I/D)S
 		.equ	C_HOME	= $02	;0b 0000001-
 
-MESSAGE:					; Max 16 tecken, sträng som skrivs ut med LCD_FLASH_PRINT
-		.db		"HELLO WORLD", $00
 
 ;::::::::::::::::
 ;	Rutiner
@@ -1793,9 +1663,7 @@ CONV_DONE:
 		
 	; ---------------
 
-LCD_FLASH_PRINT:
-		;ldi 	ZH, HIGH(MESSAGE*2)
-		;ldi 	ZL, LOW(MESSAGE*2)
+LCD_FLASH_PRINT:				; anropas med flash-meddelande laddat i Z-pekare
 		ldi		XH, HIGH(LINE)
 		ldi		XL, LOW(LINE)
 TRANSFER_CHAR:
@@ -1932,8 +1800,8 @@ LCD_BACKLIGHT_ON:
         push    r16
         lds     r16, LCD_PORT
 		sbr		r16, (1<<LCD_BL)
-        ;sts     LCD_PORT, r16   ; (Göra denna i LCD_WRITE?)
-        call	LCD_WRITE       ; med tom indata? command?
+       
+        call	LCD_WRITE
         pop     r16
 		ret
 
@@ -1943,14 +1811,13 @@ LCD_BACKLIGHT_OFF:
         push    r16
         lds     r16, LCD_PORT
 		cbr		r16, (1<<LCD_BL)
-        ;sts     LCD_PORT, r16
-        call	LCD_WRITE       ; med tom indata? command?
+        call	LCD_WRITE
         pop     r16
 		ret
 
 ;::	Initieringsrutiner ::
 
-LINE_INIT:								; Fyller hela LINE med mellanslag (" ", $20) för intitiering av skärmutskriften. Möjliggör utskrift efter en tom ruta (jmf nullbyte som avbryter utskrift)
+LINE_INIT:								; Fyller hela LINE med mellanslag (" ", $20) för intitiering av skärmutskriften.
 		ldi		ZH, HIGH(LINE)
 		ldi		ZL, LOW(LINE)
 		ldi		r16, $20
@@ -2000,100 +1867,11 @@ LCD_INIT:
 
 	; ---------------
 
-LCD_PORT_INIT:
-							; Initiering av portriktningar på arduinon
-		ldi 	r16, $07	;
-		out 	DDRB, r16	; PORTB, bit 0-2 (RS, E och BGLT) till output
-		ldi		r16, $F0	;
-		out		DDRD, r16	; PORTD, bit 4-7 till output
-		ret
-
-	; ---------------
-
 #endif /* _LCD_ */
 ;::::::::::::::::
 ;	End of file
 ;::::::::::::::::
 
-;::::::::::::::::::::::::::::::::::::::::::::
-;
-; led.asm
-;
-; TSIU51 -	Mikrodatorprojekt
-; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
-;
-;::::::::::::::::::::::::::::::::::::::::::::
-
-;::::::::::::::::
-;
-; Modulen för hantering av DAvid-kortets lysdioder.
-; Lagrar lampornas av/på status i LED_STATUS i sram, se memory.asm.
-;
-; Behöver utökas
-;
-;::::::::::::::::
-
-;::::::::::::::::
-;
-; TODO:
-;       * Övriga LEDs förutom rotary encoderns LEDs
-;
-; ENDTODO
-;::::::::::::::::
-
-#ifndef _LEDS_
-#define _LEDS_
-
-
-;::::::::::::::::
-;	LED-rutiner
-;::::::::::::::::
-
-; ROTLED_RED:
-; 		ldi		r17, ADDR_ROTLED; << 1) | 0
-; 		ldi		r16, $01						; Obs omv�nt r�d/gr�n fr�n h�rdvarubeskrivning. Maska eventuellt med en byte i SRAM om LED f�r L1/L/L2 osv ska anv�ndas
-; 		call	TWI_SEND
-; 		ret
-
-ROTLED_RED:
-		ldi		r17, ADDR_ROTLED
-		lds		r16, LED_STATUS
-		cbr 	r16, (1<<LED_ROT1)
-		sts 	LED_STATUS, r16 
-		call	TWI_SEND
-		ret
-
-ROTLED_GREEN:
-		ldi		r17, ADDR_ROTLED
-		lds		r16, LED_STATUS
-		cbr 	r16, (1<<LED_ROT0)
-		sts 	LED_STATUS, r16
-		call	TWI_SEND
-		ret
-
-ROTLED_BOTH:
-		ldi		r17, ADDR_ROTLED
-		lds		r16, LED_STATUS
-		cbr 	r16, (1<<LED_ROT1)|(1<<LED_ROT0)
-		sts 	LED_STATUS, r16 
-		call	TWI_SEND
-		ret
-
-ROTLED_OFF:
-		ldi		r17, ADDR_ROTLED
-		lds		r16, LED_STATUS
-		sbr 	r16, (1<<LED_ROT1)|(1<<LED_ROT0)
-		sts 	LED_STATUS, r16 
-		call	TWI_SEND
-		ret
-
-	; ---------------
-
-#endif /* _LEDS_ */
-;::::::::::::::::
-;	End of file
-;::::::::::::::::
 
 ;::::::::::::::::::::::::::::::::::::::::::::
 ;
@@ -2101,7 +1879,7 @@ ROTLED_OFF:
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
@@ -2115,14 +1893,6 @@ ROTLED_OFF:
 ;
 ;::::::::::::::::
 
-;::::::::::::::::
-;
-; TODO:
-;       * Argument för att styra till punkten
-;       * Gör en rutin för att skriva ut hel byte(i hex) till båda displayerna (bra för felsökning?)
-;       
-; ENDTODO
-;::::::::::::::::
 
 #ifndef _7_SEG_
 #define _7_SEG_
@@ -2133,13 +1903,13 @@ ROTLED_OFF:
 
 TAB_7SEG:
 		.db 	$3F, $06, $5B, $4F, $66, $6D, $7D, $07, $7F, $6F, $77, $7C, $39, $5E, $79, $71
-									; LOOKUP-tabell f�r 0-F i 7-seg (pgfedcba), p=0
+									; LOOKUP-tabell för 0-F i 7-seg (pgfedcba), p=0
 
 ;::::::::::::::::
 ;	Rutiner
 ;::::::::::::::::
 
-RIGHT8_WRITE:						; Beh�ver indata i r16, kommer enbart kolla l�g nibble
+RIGHT8_WRITE:						; Behöver indata i r16, kommer enbart kolla låg nibble
 		andi	r16, $0F			; 0000xxxx
 		call	LOOKUP_7SEG
 		ldi		r17, ADDR_RIGHT8
@@ -2148,7 +1918,7 @@ RIGHT8_WRITE:						; Beh�ver indata i r16, kommer enbart kolla l�g nibble
 
 	; ---------------
 
-LEFT8_WRITE:						; Beh�ver indata i r16, kommer enbart kolla l�g nibble
+LEFT8_WRITE:						; Behöver indata i r16, kommer enbart kolla låg nibble
 		andi	r16, $0F
 		call	LOOKUP_7SEG
 		ldi		r17, ADDR_LEFT8
@@ -2157,7 +1927,7 @@ LEFT8_WRITE:						; Beh�ver indata i r16, kommer enbart kolla l�g nibble
 
     ; ---------------
 
-LOOKUP_7SEG:						; Tar BIN/HEX v�rde i r16 (0-15) och omvandlar till r�tt 7-seg symbol (utan punkt) 
+LOOKUP_7SEG:						; Tar BIN/HEX värde i r16 (0-15) och omvandlar till rätt 7-seg symbol (utan punkt) 
 		push	ZL
 		push	ZH
 		ldi 	ZH,HIGH(TAB_7SEG*2)
@@ -2175,13 +1945,14 @@ LOOKUP_7SEG:						; Tar BIN/HEX v�rde i r16 (0-15) och omvandlar till r�tt 7
 ;	End of file
 ;::::::::::::::::
 
+
 ;::::::::::::::::::::::::::::::::::::::::::::
 ;
 ; flash_messages.asm
 ;
 ; TSIU51 -	Mikrodatorprojekt
 ; Author :	Oskar Lundh, osklu130, Di1b 
-;			Johan Klas�n, johkl473, Di1b
+;			Johan Klasén, johkl473, Di1b
 ;
 ;::::::::::::::::::::::::::::::::::::::::::::
 
@@ -2215,94 +1986,6 @@ P1_WINS_MSG:
 		.db		" PLAYER 1 WINS! ", $00
 P2_WINS_MSG:
 		.db		" PLAYER 2 WINS! ", $00
-
-;::::::::::::::::
-;   Bilder till DA-matrix
-;::::::::::::::::
-
-PIC:
-        .db     0b00000000, 0b00000000
-        .db     0b00000110, 0b01100000
-        .db     0b00000110, 0b01100000
-        .db     0b00000000, 0b00000000
-        .db     0b00100000, 0b00000100
-        .db     0b00011000, 0b00011000
-        .db     0b00000111, 0b11100000
-        .db     0b00000000, 0b00000000
-
-PIC_RAM: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "W", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "W", " ", " "
-        .db     " ", "W", "W", "W", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-
-;::::::::::::::::
-;   Fireworks-animering
-;::::::::::::::::
-
-FW_ANIM1: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-
-FW_ANIM2: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", "W", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-FW_ANIM3: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", "W", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", " ", "B", "W", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", "w", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-
-FW_ANIM4: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", "B", " ", "W", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", "B", "B", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "B", "B", " ", "B", "B", "W"
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", "B", "B", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", "B", " ", "W", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-
-FW_ANIM5: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", "B", " ", "B", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", "B", " ", " ", " ", "B", "B"
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", "B", " ", "B", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-
-FW_ANIM6: ; W = vit, R = röd, G = grön, B = blå
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " ", " ", " ", "B"
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "B", " ", " ", " "
-        .db     " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
-
 
 #endif /* _FLASH_MESSAGES_ */
 ;::::::::::::::::
