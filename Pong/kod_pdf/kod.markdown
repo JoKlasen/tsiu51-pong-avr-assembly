@@ -407,8 +407,9 @@ D1:
 
 ;::::::::::::::::
 ;
-;   Beskrivning
-; 
+;   I denna fil finns de rutiner som hanterar själva spelet.
+;	Det innefattar avbrottsrutinen som sköter updateringen av spelobjekten,
+;	input från joysticks, kollisionslogik, poängräkning och själva spel-loopen.
 ;
 ;::::::::::::::::
 
@@ -429,7 +430,7 @@ TIMER1_INIT:
 		sts		OCR1AH, r16
 		ldi		r16, LOW(TIMER1_TICKS)
 		sts		OCR1AL, r16
-		ldi		r16, (1<<OCIE1A)			; allow to interrupt
+		ldi		r16, (1<<OCIE1A)	; allow to interrupt
 		sts		TIMSK1, r16
 		pop		r16
 		ret
@@ -446,8 +447,8 @@ TIMER1_INT:
 		inc 	r16
 		cpi		r16, $02
 		brne	TIMER_DONE
-		call 	UPDATE_PADDLE1 ; vänstra planket
-		call 	UPDATE_PADDLE2 ; högra planket
+		call 	UPDATE_PADDLE1 		; vänstra planket
+		call 	UPDATE_PADDLE2 		; högra planket
 		clr 	r16
 TIMER_DONE:
 		sts 	COUNTER_UPDATE, r16
@@ -583,17 +584,17 @@ INIT_BALL:
 		; Startposition
 		ldi 	ZH, HIGH(BALL)
 		ldi 	ZL, LOW(BALL)
-		lds		r17, TCNT1L		; pseudo-random-värde hämtat från räknare
+		lds		r17, TCNT1L			; pseudo-random-värde hämtat från räknare
 
 		sbrc	r17, 2
 		ldi 	r16, $07
 		sbrs	r17, 2
 		ldi		r16, $08
-		st  	Z+, r16		; X
+		st  	Z+, r16				; X
 
 		mov		r16, r17
-		andi	r16, $07	; Maska med 00000XXX, värde mellan 0-7
-		st 		Z+, r16		; Y
+		andi	r16, $07			; Maska med 00000XXX, värde mellan 0-7
+		st 		Z+, r16				; Y
 
 		andi	r17, $0F
 		cpi		r17, $04
@@ -614,7 +615,7 @@ DIR_6:
 DIR_5:
 		ldi		r16, $05
 STORE_DIR:	
-		st		Z, r16		; Riktning
+		st		Z, r16				; Riktning
 		ret
 
 
@@ -644,7 +645,7 @@ BALL_NO_CARRY_X:
 	
 UPDATE_BALL:
 
-		call	CHECK_SCORING	; ska inte update ball avbryta här om en bollen är i vägg??
+		call	CHECK_SCORING
 		call	MOVE_BALL
 		call	CHECK_PADDLE_COLLISION
 		call	WALL_BOUNCE
@@ -652,7 +653,7 @@ UPDATE_BALL:
 
 		
 CHECK_SCORING:
-		lds 	r16, (BALL)		; bollens X
+		lds 	r16, (BALL)			; bollens X
 		cpi		r16, $00
 		breq	SCORE2
 		cpi 	r16, $0F
