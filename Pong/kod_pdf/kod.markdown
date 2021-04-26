@@ -1619,50 +1619,6 @@ CHECK_NOTE_DONE:
 
 ;::	Utskrifts-rutiner ::
 
-LCD_PRINT_HEX:							; r16 som indata, skriver ut ett hex-värde för en byte i ascii över två rutor på displayen
-		push	r17
-		ldi		XH, HIGH(LINE)
-		ldi		XL, LOW(LINE)
-
-		call	GET_HIGH_NIBBLE
-		call	CONVERT_BIN_TO_HEX_ASCII
-		st		X+, r17					; 16-talet i hex lagrat som ascii i LINE+0
-	
-		call	GET_LOW_NIBBLE
-		call	CONVERT_BIN_TO_HEX_ASCII
-		st		X+, r17					; Entalet i hex lagrat som ascii i LINE+1
-		ldi		r17, $00				;
-		st		X+, r17					; Insert nullbyte
-
-		call	LINE_PRINT
-		pop		r17
-		ret
-
-GET_HIGH_NIBBLE:
-		mov		r17, r16
-		swap	r17
-		andi	r17, $0F				; Ta in data från r16 höga nibble och maska bort resten.
-		ret
-
-GET_LOW_NIBBLE:
-		mov		r17, r16
-		andi	r17, $0F
-		ret
-
-CONVERT_BIN_TO_HEX_ASCII:
-		cpi		r17, $0A
-		brmi	BELOW_TEN
-TEN_OR_ABOVE:
-		subi	r17, $09
-		ori		r17, $40
-		rjmp	CONV_DONE
-BELOW_TEN:
-		ori		r17, $30
-CONV_DONE:
-		ret
-		
-	; ---------------
-
 LCD_FLASH_PRINT:				; anropas med flash-meddelande laddat i Z-pekare
 		ldi		XH, HIGH(LINE)
 		ldi		XL, LOW(LINE)
