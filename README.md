@@ -1,9 +1,7 @@
 # DAvid
 
-(TEST)
+Det här är ett importerat kodrepo från liu-gitlab för vårat projekt i TSIU51 VT21.
 
-Det här är huvudprojektet för vårat projekt i TSIU51.
+Medlemarna var Oskar Lundh (osklu130) och Johan Klasén (johkl473).
 
-Medlemarna är Oskar Lundh (osklu130) och Johan Klasén (johkl473).
-
-Målet är att med ett DAvid-kort och (DAmatriser) gör ett Pong-spel.
+Målet var att med ett DAvid-utvecklingskort och (DAmatriser) gör ett Pong-spel i AVR-assembly.
